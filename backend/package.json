@@ -1,0 +1,20 @@
+{
+  "name": "zygo-backend",
+  "type": "module",
+  "scripts": {
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.5",
+    "dotenv": "^16.4.5",
+    "hono": "^4.6.9",
+    "mongoose": "^8.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.6",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}
