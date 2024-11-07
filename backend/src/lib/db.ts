@@ -7,7 +7,7 @@ const clientOptions: ConnectOptions = {
   serverApi: { version: "1", strict: true, deprecationErrors: true },
 };
 
-export default async function runMongo() {
+export default async function startMongo() {
   try {
     await mongoose.connect(uri, clientOptions);
     console.log("You successfully connected to MongoDB!");

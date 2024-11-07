@@ -1,6 +1,5 @@
 import { Hono } from "hono";
-import { register } from "../controllers/auth/registerController.js";
-import { login } from "../controllers/auth/loginController.js";
+import { login, register } from "../controllers/authController.js";
 
 const authRouters = new Hono();
 
