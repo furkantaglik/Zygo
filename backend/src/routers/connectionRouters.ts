@@ -19,7 +19,7 @@ connectionRouters.get("/unfollow/:userId", unfollow);
 connectionRouters.get("/remove-follower/:userId", removeFollower);
 
 connectionRouters.get("/get-requests", getRequests);
-connectionRouters.get("/get-followers", getFollowers);
-connectionRouters.get("/get-following", getFollowing);
+connectionRouters.get("/get-followers/:userId", getFollowers);
+connectionRouters.get("/get-following/:userId", getFollowing);
 
 export default connectionRouters;

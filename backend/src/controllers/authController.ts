@@ -1,4 +1,4 @@
-import { sendResponse } from "../lib/sendResponse.js";
+import { sendResponse } from "../lib/utils/sendResponse.js";
 import type { Context } from "hono";
 import { User } from "../models/user.js";
 import { config } from "dotenv";
@@ -54,23 +54,27 @@ export const register = async (c: Context) => {
     return sendResponse(c, 400, "Kullanıcı zaten mevcut");
   }
 
-  const hashedPassword = await generateEncryptedPassword(password);
-  const addedUser = new User({
-    email,
-    username,
-    firstName,
-    lastName,
-    password: hashedPassword,
-  });
-  await addedUser.save();
+  try {
+    const hashedPassword = await generateEncryptedPassword(password);
+    const addedUser = new User({
+      email,
+      username,
+      firstName,
+      lastName,
+      password: hashedPassword,
+    });
+    await addedUser.save();
 
-  const token = generateJwt({
-    id: addedUser._id,
-    email: addedUser.email,
-    username: addedUser.username,
-  });
+    const token = generateJwt({
+      id: addedUser._id,
+      email: addedUser.email,
+      username: addedUser.username,
+    });
 
-  return sendResponse(c, 200, "Kayıt başarılı", token);
+    return sendResponse(c, 200, "Kayıt başarılı", token);
+  } catch (error) {
+    return sendResponse(c, 500, "Kayıt sırasında bir hata oluştu.");
+  }
 };
 
 export const login = async (c: Context) => {
@@ -80,27 +84,31 @@ export const login = async (c: Context) => {
     return sendResponse(c, 400, "Kullanıcı adı veya şifre boş olamaz.");
   }
 
-  const user = await User.findOne({
-    $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
-  });
+  try {
+    const user = await User.findOne({
+      $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
+    });
 
-  if (!user) {
-    return sendResponse(c, 404, "Kullanıcı bulunamadı");
+    if (!user) {
+      return sendResponse(c, 404, "Kullanıcı bulunamadı");
+    }
+
+    const isPasswordValid = await generateDecryptedPassword(
+      password,
+      user.password
+    );
+    if (!isPasswordValid) {
+      return sendResponse(c, 401, "Şifre Geçersiz");
+    }
+
+    const token = generateJwt({
+      id: user._id,
+      email: user.email,
+      username: user.username,
+    });
+
+    return sendResponse(c, 200, "Giriş başarılı", token);
+  } catch (error) {
+    return sendResponse(c, 500, "Giriş sırasında bir hata oluştu.");
   }
-
-  const isPasswordValid = await generateDecryptedPassword(
-    password,
-    user.password
-  );
-  if (!isPasswordValid) {
-    return sendResponse(c, 401, "Şifre Geçersiz");
-  }
-
-  const token = generateJwt({
-    id: user._id,
-    email: user.email,
-    username: user.username,
-  });
-
-  return sendResponse(c, 200, "Giriş başarılı", token);
 };

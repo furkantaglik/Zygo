@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
-import { sendResponse } from "../lib/sendResponse.js";
+import { sendResponse } from "../lib/utils/sendResponse.js";
 import type { Context, Next } from "hono";
 import { User } from "../models/user.js";
+import { Post } from "../models/post.js";
 
 const JWT_SECRET = process.env.JWT_SECRET_KEY!;
 
@@ -42,3 +43,11 @@ export const checkUserRole = async (c: Context, next: Next) => {
     return sendResponse(c, 500, "Rol doğrulaması sırasında bir hata oluştu");
   }
 };
+
+// export const checkUserPermission = async (c: Context, next: Next) => {
+//   const post = await Post.findById(postId);
+//   if (!post) return { error: "Gönderi bulunamadı." };
+//   if (post.user.toString() !== userId)
+//     return { error: "Bu gönderiye erişim yetkiniz yok." };
+//   return { post };
+// };

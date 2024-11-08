@@ -1,30 +1,33 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface IFollowRequest extends Document {
+interface IConnection extends Document {
   requester: mongoose.Types.ObjectId;
   receiver: mongoose.Types.ObjectId;
   status: "pending" | "accepted" | "rejected";
 }
 
-const ConnectionSchema = new Schema<IFollowRequest>({
-  requester: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+const ConnectionSchema = new Schema<IConnection>(
+  {
+    requester: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    receiver: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "rejected"],
+      default: "pending",
+    },
   },
-  receiver: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: ["pending", "accepted", "rejected"],
-    default: "pending",
-  },
-});
+  { timestamps: true }
+);
 
-export const Connection = mongoose.model<IFollowRequest>(
+export const Connection = mongoose.model<IConnection>(
   "Connection",
   ConnectionSchema
 );
