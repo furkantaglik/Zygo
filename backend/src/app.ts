@@ -1,17 +1,17 @@
 import { Hono } from "hono";
-import authRouters from "./routers/authRouters.js";
 import { cors } from "hono/cors";
 import { prettyJSON } from "hono/pretty-json";
 import { sendResponse } from "./lib/utils/sendResponse.js";
 import { errorHandler } from "./lib/utils/errorHandler.js";
 import { checkBearerToken } from "./middlewares/AuthMiddleware.js";
+import authRouters from "./routers/authRouters.js";
 import connectionRouters from "./routers/connectionRouters.js";
 import postRouters from "./routers/postRouters.js";
 import storyRouters from "./routers/storyRouters.js";
 import commentRouters from "./routers/commentRouters.js";
 import likeRouters from "./routers/likeRouters.js";
 
-//*configuration
+//* configuration
 const app = new Hono().basePath("/api");
 app.use(cors());
 app.use(prettyJSON());

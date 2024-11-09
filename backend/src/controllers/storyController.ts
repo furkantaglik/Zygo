@@ -2,6 +2,7 @@ import type { Context } from "hono";
 import { Story } from "../models/story.js";
 import { sendResponse } from "../lib/utils/sendResponse.js";
 import { validateObjectId } from "../lib/utils/valideObjectId.js";
+import { User } from "../models/user.js";
 
 export const createStory = async (c: Context) => {
   const { content, mediaType } = await c.req.json();
@@ -76,4 +77,31 @@ export const getUserStories = async (c: Context) => {
     "Kullanıcıya ait geçerli hikayeler başarıyla listelendi.",
     stories
   );
+};
+
+export const getFollowingStories = async (c: Context) => {
+  const userId = c.get("user").id;
+  try {
+    const user = await User.findById(userId).populate("following", "_id");
+    if (!user) {
+      return sendResponse(c, 404, "KUllanıcı bulunamadı");
+    }
+    const followingIds = user.following.map((f: any) => f._id);
+    const stories = await Story.find({ user: { $in: followingIds } })
+      .populate("user", "username")
+      .sort({ createdAt: -1 });
+
+    return sendResponse(
+      c,
+      200,
+      "Takip edilen kullanıcıların hikayeleri başarıyla listelendi.",
+      stories
+    );
+  } catch (error) {
+    return sendResponse(
+      c,
+      500,
+      "Takip edilen hikayeler listelenirken bir hata oluştu."
+    );
+  }
 };

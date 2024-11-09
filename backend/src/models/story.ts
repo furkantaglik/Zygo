@@ -4,6 +4,8 @@ export interface IStory extends Document {
   content: string;
   mediaType: "image" | "video";
   expiresAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
   user: mongoose.Types.ObjectId;
 }
 

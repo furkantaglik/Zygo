@@ -1,6 +1,7 @@
 import type { Context } from "hono";
 import { Post } from "../models/post.js";
 import { sendResponse } from "../lib/utils/sendResponse.js";
+import { User } from "../models/user.js";
 
 const checkUserPermission = async (postId: string, userId: string) => {
   const post = await Post.findById(postId);
@@ -119,5 +120,32 @@ export const getByPostId = async (c: Context) => {
     return sendResponse(c, 200, "Gönderi başarıyla bulundu.", post);
   } catch (err) {
     return sendResponse(c, 500, "Gönderi getirilirken bir hata oluştu.");
+  }
+};
+
+export const getFollowingPosts = async (c: Context) => {
+  const userId = c.get("user").id;
+  try {
+    const user = await User.findById(userId).populate("following", "_id");
+    if (!user) {
+      return sendResponse(c, 404, "KUllanıcı bulunamadı");
+    }
+    const followingIds = user.following.map((f: any) => f._id);
+    const posts = await Post.find({ user: { $in: followingIds } })
+      .populate("user", "username")
+      .sort({ createdAt: -1 });
+
+    return sendResponse(
+      c,
+      200,
+      "Takip edilen kullanıcıların gönderileri başarıyla listelendi.",
+      posts
+    );
+  } catch (error) {
+    return sendResponse(
+      c,
+      500,
+      "Takip edilen gönderiler listelenirken bir hata oluştu."
+    );
   }
 };

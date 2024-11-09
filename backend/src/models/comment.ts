@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface IComment extends Document {
   content: string;
   createdAt: Date;
+  updatedAt: Date;
   postId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
 }

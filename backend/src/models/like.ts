@@ -1,20 +1,26 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface IPost extends Document {
-  content: string;
-  mediaUrl?: string;
-  mediaType?: "image" | "video";
-  user: mongoose.Types.ObjectId;
+export interface ILike extends Document {
+  postId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-const PostSchema: Schema = new Schema(
+const LikeSchema: Schema = new Schema(
   {
-    content: { type: String, required: true },
-    mediaUrl: { type: String },
-    mediaType: { type: String, enum: ["image", "video"] },
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    postId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Post",
+      required: true,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
-export const Post = mongoose.model<IPost>("Post", PostSchema);
+export const Like = mongoose.model<ILike>("Like", LikeSchema);

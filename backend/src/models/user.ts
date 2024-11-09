@@ -6,9 +6,12 @@ export interface IUser extends Document {
   username: string;
   email: string;
   password: string;
+  bio?: string;
   avatar?: string;
   role: "admin" | "user";
   private: boolean;
+  createdAt: Date;
+  updatedAt: Date;
   followers: mongoose.Types.ObjectId[];
   following: mongoose.Types.ObjectId[];
   posts: mongoose.Types.ObjectId[];
@@ -19,12 +22,13 @@ export interface IUser extends Document {
 
 const UserSchema: Schema = new Schema(
   {
-    firstName: { type: String },
-    lastName: { type: String },
+    firstName: { type: String, required: false },
+    lastName: { type: String, required: false },
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    avatar: { type: String },
+    bio: { type: String, required: false },
+    avatar: { type: String, required: false },
     private: { type: Boolean, required: true, default: false },
     role: {
       type: String,
