@@ -1,4 +1,5 @@
-export interface IUser extends Document {
+export type IUser = {
+  _id: string;
   firstName?: string;
   lastName?: string;
   username: string;
@@ -16,4 +17,4 @@ export interface IUser extends Document {
   stories: string[];
   comments: string[];
   likes: string[];
-}
+};

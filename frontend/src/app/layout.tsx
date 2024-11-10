@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "@/components/navbar";
-import Head from "next/head";
+import SWRProvider from "./SWRProvider";
 
 export const metadata: Metadata = {
   title: "Zygo",
@@ -15,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <SWRProvider>{children}</SWRProvider>
+      </body>
     </html>
   );
 }

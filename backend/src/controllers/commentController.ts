@@ -60,17 +60,16 @@ export const deleteComment = async (c: Context) => {
 };
 
 export const updateComment = async (c: Context) => {
-  const { commentId } = c.req.param();
-  const { content } = await c.req.json();
+  const { content, _id } = await c.req.json();
   const userId = c.get("user").id;
 
-  const { error } = validateCommentAndPostIds(commentId, "");
+  const { error } = validateCommentAndPostIds(_id, "");
   if (error) {
     return sendResponse(c, 400, error);
   }
 
   try {
-    const comment = await Comment.findById(commentId);
+    const comment = await Comment.findById(_id);
     if (!comment) {
       return sendResponse(c, 404, "Yorum bulunamadı.");
     }

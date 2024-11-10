@@ -7,7 +7,7 @@ import {
 
 const likeRouters = new Hono();
 likeRouters.post("/create-like", createLike);
-likeRouters.post("/delete-like/:commentId", deleteLike);
-likeRouters.post("/get-post-likes/:postId", getPostLikes);
+likeRouters.get("/delete-like/:commentId", deleteLike);
+likeRouters.get("/get-post-likes/:postId", getPostLikes);
 
 export default likeRouters;

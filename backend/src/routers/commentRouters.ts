@@ -8,7 +8,7 @@ import {
 
 const commentRouters = new Hono();
 commentRouters.post("/create-comment", createComment);
-commentRouters.post("/update-comment/:commentId", updateComment);
+commentRouters.post("/update-comment", updateComment);
 commentRouters.get("/delete-comment/:commentId", deleteComment);
 commentRouters.get("/get-post-comments/:postId", getCommentsByPostId);
 

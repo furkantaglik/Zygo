@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import { Post } from "../models/post.js";
 import { sendResponse } from "../lib/utils/sendResponse.js";
-import { User } from "../models/user.js";
+import { User, type IUser } from "../models/user.js";
 
 const checkUserPermission = async (postId: string, userId: string) => {
   const post = await Post.findById(postId);
@@ -13,14 +13,14 @@ const checkUserPermission = async (postId: string, userId: string) => {
 
 export const createPost = async (c: Context) => {
   const { content, mediaUrl, mediaType } = await c.req.json();
-  const userId = c.get("user").id;
+  const user = c.get("user") as IUser;
 
   if (!content) {
     return sendResponse(c, 400, "İçerik alanı zorunludur.");
   }
 
   const newPost = new Post({
-    user: userId,
+    user: user.id,
     content,
     mediaUrl,
     mediaType,
@@ -35,11 +35,10 @@ export const createPost = async (c: Context) => {
 };
 
 export const updatePost = async (c: Context) => {
-  const { postId } = c.req.param();
-  const { content, mediaUrl, mediaType } = await c.req.json();
+  const { content, mediaUrl, mediaType, _id } = await c.req.json();
   const userId = c.get("user").id;
 
-  const { post, error } = await checkUserPermission(postId, userId);
+  const { post, error } = await checkUserPermission(_id, userId);
   if (error || !post)
     return sendResponse(c, 404, error || "Gönderi bulunamadı.");
 

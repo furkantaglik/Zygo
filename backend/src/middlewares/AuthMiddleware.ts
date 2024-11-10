@@ -2,8 +2,9 @@ import jwt from "jsonwebtoken";
 import { sendResponse } from "../lib/utils/sendResponse.js";
 import type { Context, Next } from "hono";
 import { User } from "../models/user.js";
-import { Post } from "../models/post.js";
+import { config } from "dotenv";
 
+config();
 const JWT_SECRET = process.env.JWT_SECRET_KEY!;
 
 export const checkBearerToken = async (c: Context, next: Next) => {
@@ -18,6 +19,7 @@ export const checkBearerToken = async (c: Context, next: Next) => {
     c.set("user", decoded);
     await next();
   } catch (error) {
+    console.log(error);
     return sendResponse(
       c,
       401,

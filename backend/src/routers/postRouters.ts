@@ -10,10 +10,10 @@ import {
 const postRouters = new Hono();
 
 postRouters.post("/create-post", createPost);
-postRouters.post("/update-post/:postId", updatePost);
-postRouters.post("/delete-post/:postId", deletePost);
-postRouters.post("/get-user-posts/:userId", getUserPosts);
-postRouters.post("/get-all-posts", getAllPosts);
-postRouters.post("/get-by-postId/:postId", getAllPosts);
+postRouters.post("/update-post", updatePost);
+postRouters.get("/delete-post/:postId", deletePost);
+postRouters.get("/get-user-posts/:userId", getUserPosts);
+postRouters.get("/get-all-posts", getAllPosts);
+postRouters.get("/get-by-postId/:postId", getAllPosts);
 
 export default postRouters;

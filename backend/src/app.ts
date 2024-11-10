@@ -10,6 +10,7 @@ import postRouters from "./routers/postRouters.js";
 import storyRouters from "./routers/storyRouters.js";
 import commentRouters from "./routers/commentRouters.js";
 import likeRouters from "./routers/likeRouters.js";
+import userRouters from "./routers/userRouters.js";
 
 //* configuration
 const app = new Hono().basePath("/api");
@@ -26,6 +27,12 @@ app.notFound((c) => {
 app.get("/", (c) => {
   return c.text("Welcome to Zygo!");
 });
+
+function delay(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
+
+await delay(4000);
 app.route("/auth", authRouters);
 
 //* Default routes ---------
@@ -35,5 +42,6 @@ app.route("/post", postRouters);
 app.route("/story", storyRouters);
 app.route("/comment", commentRouters);
 app.route("/like", likeRouters);
+app.route("/user", userRouters);
 
 export default app;

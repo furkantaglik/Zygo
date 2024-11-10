@@ -12,9 +12,9 @@ import {
 
 const connectionRouters = new Hono();
 
-connectionRouters.post("/send-request/:receiverId", sendRequest);
-connectionRouters.post("/accept-request/:requestId", acceptRequest);
-connectionRouters.post("/reject-request/:requestId", rejectRequest);
+connectionRouters.get("/send-request/:receiverId", sendRequest);
+connectionRouters.get("/accept-request/:requestId", acceptRequest);
+connectionRouters.get("/reject-request/:requestId", rejectRequest);
 connectionRouters.get("/unfollow/:userId", unfollow);
 connectionRouters.get("/remove-follower/:userId", removeFollower);
 
