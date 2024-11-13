@@ -16,6 +16,7 @@ export const checkBearerToken = async (c: Context, next: Next) => {
   const token = authHeader.split(" ")[1];
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
+
     c.set("user", decoded);
     await next();
   } catch (error) {

@@ -8,14 +8,14 @@ const createStory = async (
   url: string,
   { arg }: { arg: { story: IStory } }
 ) => {
-  await axiosInstance.post(url, arg.story);
+  return await axiosInstance.post(url, arg.story);
 };
 
 const deleteStory = async (
   url: string,
   { arg }: { arg: { storyId: string } }
 ) => {
-  await axiosInstance.get(`${url}/${arg.storyId}`);
+  return await axiosInstance.get(`${url}/${arg.storyId}`);
 };
 
 // Hooks ------

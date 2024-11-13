@@ -1,3 +1,5 @@
+import { IUser } from "./user";
+
 export type IStory = {
   _id: string;
   content: string;
@@ -5,5 +7,5 @@ export type IStory = {
   expiresAt: Date;
   createdAt: string;
   updatedAt: string;
-  user: string;
+  user: IUser;
 };

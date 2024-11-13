@@ -7,53 +7,46 @@
 @layer base {
   :root {
     --foreground: #eeefe1;
-    --background: #070717;
-    --primary: #26baa1;
-    --secondary: #0f6779;
-    --accent: #36118c;
+    --background: #000000;
+    --primary: #dc1155;
+    --secondary: #0c20ce;
+    --accent: #1c1a1a;
   }
 
   body {
+    overflow-y: scroll;
+    scroll-behavior: smooth;
     font-family: "Roboto", sans-serif;
     font-weight: 400;
     color: var(--foreground);
     background-color: var(--background);
   }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5 {
-    font-family: "Roboto Serif", serif;
-    font-weight: 600;
+  /* body::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
   }
 
-  h1 {
-    font-size: 4.21rem; /* 67.36px */
+  body::-webkit-scrollbar-track {
+    background-color: var(--background);
   }
 
-  h2 {
-    font-size: 3.158rem; /* 50.56px */
+  body::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
   }
 
-  h3 {
-    font-size: 2.369rem; /* 37.92px */
-  }
-
-  h4 {
-    font-size: 1.777rem; /* 28.48px */
-  }
-
-  h5 {
-    font-size: 1.333rem; /* 21.28px */
-  }
-
-  small {
-    font-size: 0.75rem; /* 12px */
-  }
+  body::-webkit-scrollbar-thumb:hover {
+    background-color: #ff0040;
+  } */
 }
 
-html {
-  font-size: 100%; /* 16px */
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
 }

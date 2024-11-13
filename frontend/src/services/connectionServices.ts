@@ -14,18 +14,18 @@ async function acceptRequest(
   url: string,
   { arg }: { arg: { requestId: string } }
 ) {
-  await axiosInstance.get(`${url}/${arg.requestId}`);
+  return await axiosInstance.get(`${url}/${arg.requestId}`);
 }
 
 async function rejectRequest(
   url: string,
   { arg }: { arg: { requestId: string } }
 ) {
-  await axiosInstance.get(`${url}/${arg.requestId}`);
+  return await axiosInstance.get(`${url}/${arg.requestId}`);
 }
 
 async function unfollow(url: string, { arg }: { arg: { userId: string } }) {
-  await axiosInstance.get(`${url}/${arg.userId}`);
+  return await axiosInstance.get(`${url}/${arg.userId}`);
 }
 
 async function removeFollower(
@@ -41,8 +41,10 @@ export function useGetFollowing(userId: string): SWRResponse<IConnection[]> {
   return useSWR(`connection/get-following/${userId}`, fetcher);
 }
 
-export function useGetFollowers(userId: string): SWRResponse<IConnection[]> {
-  return useSWR(`connection/get-followers/${userId}`, fetcher);
+export function useGetFollowers(
+  userId: string | undefined
+): SWRResponse<IConnection[]> {
+  return useSWR(userId ? `connection/get-followers/${userId}` : null, fetcher);
 }
 
 export function useGetRequests(): SWRResponse<IConnection[]> {

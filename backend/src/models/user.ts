@@ -10,8 +10,8 @@ export interface IUser extends Document {
   avatar?: string;
   role: "admin" | "user";
   private: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
   followers: mongoose.Types.ObjectId[];
   following: mongoose.Types.ObjectId[];
   posts: mongoose.Types.ObjectId[];
@@ -22,13 +22,13 @@ export interface IUser extends Document {
 
 const UserSchema: Schema = new Schema(
   {
-    firstName: { type: String, required: false },
-    lastName: { type: String, required: false },
+    firstName: { type: String, required: false, default: null },
+    lastName: { type: String, required: false, default: null },
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    bio: { type: String, required: false },
-    avatar: { type: String, required: false },
+    bio: { type: String, required: false, default: null },
+    avatar: { type: String, required: false, default: null },
     private: { type: Boolean, required: true, default: false },
     role: {
       type: String,

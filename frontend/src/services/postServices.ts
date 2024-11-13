@@ -3,20 +3,21 @@ import useSWRMutation from "swr/mutation";
 import { axiosInstance } from "./fetcher";
 import { IPost } from "@/types/post";
 import fetcher from "./fetcher";
+import { useGetUserByUsername } from "./userServices";
 
 const createPost = async (url: string, { arg }: { arg: { post: IPost } }) => {
-  await axiosInstance.post(url, arg.post);
+  return await axiosInstance.post(url, arg.post);
 };
 
 const deletePost = async (
   url: string,
   { arg }: { arg: { postId: string } }
 ) => {
-  await axiosInstance.get(`${url}/${arg.postId}`);
+  return await axiosInstance.get(`${url}/${arg.postId}`);
 };
 
 const updatePost = async (url: string, { arg }: { arg: { post: IPost } }) => {
-  await axiosInstance.post(url, arg.post);
+  return await axiosInstance.post(url, arg.post);
 };
 
 // Hooks ------
@@ -25,8 +26,10 @@ export function useGetAllPosts(): SWRResponse<IPost[]> {
   return useSWR("post/get-all-posts", fetcher);
 }
 
-export function useGetUserPosts(userId: string): SWRResponse<IPost[]> {
-  return useSWR(`post/get-user-posts/${userId}`, fetcher);
+export function useGetUserPosts(
+  userId: string | undefined
+): SWRResponse<IPost[]> {
+  return useSWR(userId ? `post/get-user-posts/${userId}` : null, fetcher);
 }
 
 export function useGetPostById(postId: string): SWRResponse<IPost> {

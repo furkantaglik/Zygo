@@ -9,10 +9,12 @@
   "dependencies": {
     "@hono/node-server": "^1.13.5",
     "bcrypt": "^5.1.1",
+    "cloudinary": "^2.5.1",
     "dotenv": "^16.4.5",
     "hono": "^4.6.9",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.8.0"
+    "mongoose": "^8.8.0",
+    "nanoid": "^5.0.8"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

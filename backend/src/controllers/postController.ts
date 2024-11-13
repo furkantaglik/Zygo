@@ -12,24 +12,35 @@ const checkUserPermission = async (postId: string, userId: string) => {
 };
 
 export const createPost = async (c: Context) => {
-  const { content, mediaUrl, mediaType } = await c.req.json();
-  const user = c.get("user") as IUser;
-
-  if (!content) {
-    return sendResponse(c, 400, "İçerik alanı zorunludur.");
-  }
-
-  const newPost = new Post({
-    user: user.id,
-    content,
-    mediaUrl,
-    mediaType,
-  });
-
   try {
+    const file = await c.get("file");
+    const { content } = await c.req.parseBody();
+    console.log(content);
+
+    if (!file || !file.path) {
+      return sendResponse(c, 400, "Dosya yüklenmedi.");
+    }
+
+    const user = c.get("user") as IUser;
+    if (!user) {
+      return sendResponse(c, 401, "Kullanıcı oturumu geçerli değil.");
+    }
+
+    if (!content) {
+      return sendResponse(c, 400, "İçerik alanı zorunludur.");
+    }
+    const newPost = new Post({
+      user: user.id,
+      content,
+      mediaUrl: file.path,
+      mediaType: file.mediaType,
+    });
+
     await newPost.save();
-    return sendResponse(c, 200, "Gönderi başarıyla oluşturuldu.", newPost);
+
+    return sendResponse(c, 200, "Gönderi başarıyla oluşturuldu.");
   } catch (err) {
+    console.error("Gönderi oluşturulurken bir hata oluştu:", err);
     return sendResponse(c, 500, "Gönderi oluşturulurken bir hata oluştu.");
   }
 };
@@ -95,7 +106,7 @@ export const getUserPosts = async (c: Context) => {
 export const getAllPosts = async (c: Context) => {
   try {
     const posts = await Post.find()
-      .populate("user", "firstName lastName username")
+      .populate("user", "username")
       .sort({ createdAt: -1 });
     return sendResponse(c, 200, "Tüm gönderiler başarıyla listelendi.", posts);
   } catch (err) {
@@ -107,10 +118,7 @@ export const getByPostId = async (c: Context) => {
   const { postId } = c.req.param();
 
   try {
-    const post = await Post.findById(postId).populate(
-      "user",
-      "firstName lastName username"
-    );
+    const post = await Post.findById(postId).populate("user", " username");
 
     if (!post) {
       return sendResponse(c, 404, "Gönderi bulunamadı.");

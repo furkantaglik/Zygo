@@ -10,6 +10,8 @@ import {
   Search,
   User,
 } from "lucide-react";
+import { useAuthStore } from "@/lib/zustand/authStore";
+import Avatar from "./user/avatar";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -25,22 +27,26 @@ const Navbar = () => {
 
   const isActive = (path: string) =>
     pathname === path
-      ? "lg:bg-secondary lg:scale-100 scale-110 lg:text-foreground text-secondary "
+      ? "lg:bg-accent lg:scale-100 scale-110 lg:text-foreground text-accent "
       : "";
+
+  const { user } = useAuthStore();
 
   return (
     <>
       {/* Desktop Navbar */}
-      <div className="hidden lg:flex flex-col h-screen w-full border-r border-secondary pt-5">
+      <div className="hidden lg:flex flex-col h-screen w-full border-r border-accent pt-5 sticky top-0">
         <Link href="/">
-          <h4 className="ml-4">Zygo</h4>
+          <h4 className="ml-4 text-3xl font-semibold italic text-primary">
+            Zygo
+          </h4>
         </Link>
         <ul className="mt-5 flex flex-col gap-y-5 text-lg">
           {menuItems.slice(0, -1).map(({ href, label, icon }) => (
             <Link
               href={href}
               key={href}
-              className={`p-2 hover:bg-secondary mx-2 rounded cursor-pointer transition-all flex items-center gap-x-2 ${isActive(
+              className={`p-2 hover:bg-accent mx-2 rounded cursor-pointer transition-all flex items-center gap-x-2 ${isActive(
                 href
               )}`}
             >
@@ -50,20 +56,20 @@ const Navbar = () => {
           ))}
         </ul>
         <Link
-          href="/profile"
-          className={`p-2 mb-5 hover:bg-secondary mx-2 rounded cursor-pointer transition-all flex items-center gap-x-2 mt-auto text-lg ${isActive(
-            "/profile"
+          href={`/${user?.username}`}
+          className={`p-2 mb-5 hover:bg-accent mx-2 rounded cursor-pointer transition-all flex items-center gap-x-2 mt-auto text-lg ${isActive(
+            "/" + user?.username
           )}`}
         >
-          <User />
+          <Avatar size={30} />
           Profile
         </Link>
       </div>
 
       {/* Mobile Navbar */}
-      <div className="lg:hidden fixed bottom-0 left-0 w-full p-4 border-t border-primary">
+      <div className="lg:hidden fixed bottom-0 left-0 w-full p-4 border-t border-accent  bg-background z-50 mt-10 ">
         <ul className="flex justify-around">
-          {menuItems.map(({ href, icon }) => (
+          {menuItems.slice(0, -1).map(({ href, label, icon }) => (
             <Link
               href={href}
               key={href}
@@ -72,6 +78,12 @@ const Navbar = () => {
               {icon}
             </Link>
           ))}
+          <Link
+            href={`/${user?.username}`}
+            className={`hover:scale-110 transition-all`}
+          >
+            <Avatar size={30} />
+          </Link>
         </ul>
       </div>
     </>

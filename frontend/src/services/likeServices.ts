@@ -4,15 +4,18 @@ import { ILike } from "@/types/like";
 import fetcher from "./fetcher";
 import useSWRMutation from "swr/mutation";
 
-const createLike = async (url: string, { arg }: { arg: { like: ILike } }) => {
-  await axiosInstance.post(url, arg.like);
+const createLike = async (
+  url: string,
+  { arg }: { arg: { postId: string } }
+) => {
+  return await axiosInstance.post(url, { postId: arg.postId });
 };
 
 const deleteLike = async (
   url: string,
   { arg }: { arg: { likeId: string } }
 ) => {
-  await axiosInstance.get(`${url}/${arg.likeId}`);
+  return await axiosInstance.get(`${url}/${arg.likeId}`);
 };
 
 // Hooks ------

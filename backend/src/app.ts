@@ -28,11 +28,6 @@ app.get("/", (c) => {
   return c.text("Welcome to Zygo!");
 });
 
-function delay(ms: number) {
-  return new Promise<void>((resolve) => setTimeout(resolve, ms));
-}
-
-await delay(4000);
 app.route("/auth", authRouters);
 
 //* Default routes ---------

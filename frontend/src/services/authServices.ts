@@ -1,19 +1,18 @@
 import useSWRMutation from "swr/mutation";
 import { axiosInstance } from "./fetcher";
-import { IUser } from "@/types/user";
 
 const registerRequest = async (
   url: string,
   { arg }: { arg: { username: string; email: string; password: string } }
 ) => {
-  await axiosInstance.post(url, { ...arg });
+  return (await axiosInstance.post(url, { ...arg })).data;
 };
 
 const loginRequest = async (
   url: string,
   { arg }: { arg: { emailOrUsername: string; password: string } }
 ) => {
-  await axiosInstance.post(url, { ...arg });
+  return (await axiosInstance.post(url, { ...arg })).data;
 };
 
 export function useRegister() {
@@ -32,8 +31,6 @@ export function useLogin() {
     onError(error) {
       console.error("Error logging in", error);
     },
-    onSuccess: (data) => {
-      console.log("Login successful", data);
-    },
+    onSuccess(data) {},
   });
 }

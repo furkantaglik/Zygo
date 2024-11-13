@@ -1,8 +1,8 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 interface IConnection extends Document {
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
   requester: mongoose.Types.ObjectId;
   receiver: mongoose.Types.ObjectId;
   status: "pending" | "accepted" | "rejected";

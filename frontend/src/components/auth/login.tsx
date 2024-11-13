@@ -1,18 +1,10 @@
 "use client";
-import React, { useState } from "react";
-import SubmitButton from "../submitButton";
-import Link from "next/link";
 
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import useSWR from "swr";
-import { IUser } from "@/types/user";
-import {
-  useAllPosts,
-  useCreatePost,
-  useDeletePost,
-  useUpdatePost,
-} from "@/services/postServices";
-import { IPost } from "@/types/post";
+import { useLogin } from "@/services/authServices";
+import { useAuthStore } from "@/lib/zustand/authStore";
 
 interface LoginFormData {
   emailOrUsername: string;
@@ -24,17 +16,10 @@ const Login = () => {
     emailOrUsername: "",
     password: "",
   });
-  const router = useRouter();
 
-  const { data } = useAllPosts();
-  const { trigger } = useDeletePost();
-  const post: IPost = {
-    _id: "6730ac20a820df3acf577279",
-    content: "ssadasd",
-    mediaUrl: "dasd",
-    mediaType: "image",
-  };
-  trigger({ postId: "6730ac20a820df3acf577279" });
+  const router = useRouter();
+  const { trigger, isMutating } = useLogin();
+  const { isAuthenticated, setUser, setToken, token } = useAuthStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -43,13 +28,18 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const response = await trigger(formData);
+    setUser(response.user);
+    setToken(response.token);
     router.push("/");
   };
 
   return (
     <section className="flex items-center justify-center min-h-screen">
-      <div className="border-y sm:border border-secondary rounded mx-auto p-5 sm:w-[400px] w-full">
-        <h3 className="text-center border-b mb-10">Zygo</h3>
+      <div className="border-y sm:border border-accent rounded mx-auto p-5 sm:w-[400px] w-full">
+        <h1 className="text-center text-2xl italic font-semibold border-b border-primary mb-10 text-primary">
+          Zygo
+        </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-y-5 mb-5">
           <div className="flex flex-col">
             <label htmlFor="emailOrUsername" className="font-semibold mb-1">
@@ -61,7 +51,7 @@ const Login = () => {
               value={formData.emailOrUsername}
               onChange={handleChange}
               placeholder="ornek@gmail.com"
-              className="bg-transparent ring-0 border-b border-secondary outline-none focus:ring focus:ring-secondary rounded p-1"
+              className="bg-transparent ring-0 border-b border-accent outline-none focus:ring focus:ring-accent rounded p-1"
             />
           </div>
           <div className="flex flex-col">
@@ -74,16 +64,20 @@ const Login = () => {
               value={formData.password}
               onChange={handleChange}
               placeholder="******"
-              className="bg-transparent ring-0 border-b border-secondary outline-none focus:ring focus:ring-secondary rounded p-1"
+              className="bg-transparent ring-0 border-b border-accent outline-none focus:ring focus:ring-accent rounded p-1"
             />
           </div>
-          <SubmitButton className="bg-secondary rounded font-semibold p-1">
-            Giriş
-          </SubmitButton>
+          <button
+            type="submit"
+            className="p-1 bg-accent rounded font-semibold"
+            disabled={isMutating}
+          >
+            Giriş Yap
+          </button>
         </form>
         <small>
           Hesabın yok mu?{" "}
-          <Link href="/auth/register" className="text-secondary">
+          <Link href="/auth/register" className="text-primary">
             Kayıt Ol
           </Link>
         </small>

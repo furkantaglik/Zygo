@@ -6,23 +6,23 @@ import fetcher from "./fetcher";
 
 const createComment = async (
   url: string,
-  { arg }: { arg: { comment: IComment } }
+  { arg }: { arg: { content: string; postId: string } }
 ) => {
-  await axiosInstance.post(url, arg.comment);
+  return await axiosInstance.post(url, { ...arg });
 };
 
 const updateComment = async (
   url: string,
   { arg }: { arg: { comment: IComment } }
 ) => {
-  await axiosInstance.post(url, arg.comment);
+  return await axiosInstance.post(url, arg.comment);
 };
 
 const deleteComment = async (
   url: string,
   { arg }: { arg: { commentId: string } }
 ) => {
-  await axiosInstance.get(`${url}/${arg.commentId}`);
+  return await axiosInstance.get(`${url}/${arg.commentId}`);
 };
 
 // Hooks ------
@@ -57,14 +57,14 @@ export function useUpdateComment(postId: string) {
   });
 }
 
-export function useDeleteComment(postId: string) {
+export function useDeleteComment(postId: string, commentId: string) {
   const { mutate } = useGetComments(postId);
 
   return useSWRMutation("comment/delete-comment", deleteComment, {
     onError(error) {
       console.error("Error deleting comment", error);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       mutate();
     },
   });

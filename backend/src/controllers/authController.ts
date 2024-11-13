@@ -43,9 +43,9 @@ export const verifyUser = async (
 };
 
 export const register = async (c: Context) => {
-  const { email, username, password, firstName, lastName } = await c.req.json();
+  const { email, username, password } = await c.req.json();
 
-  if (!email || !username || !password || !firstName || !lastName) {
+  if (!email || !username || !password) {
     return sendResponse(c, 400, "Tüm alanları doldurduğunuzdan emin olun.");
   }
 
@@ -59,8 +59,6 @@ export const register = async (c: Context) => {
     const addedUser = new User({
       email,
       username,
-      firstName,
-      lastName,
       password: hashedPassword,
     });
     await addedUser.save();
@@ -71,7 +69,7 @@ export const register = async (c: Context) => {
       username: addedUser.username,
     });
 
-    return sendResponse(c, 200, "Kayıt başarılı", token);
+    return sendResponse(c, 200, "Kayıt başarılı", { token, user: addedUser });
   } catch (error) {
     return sendResponse(c, 500, "Kayıt sırasında bir hata oluştu.");
   }
@@ -107,7 +105,7 @@ export const login = async (c: Context) => {
       username: user.username,
     });
 
-    return sendResponse(c, 200, "Giriş başarılı", token);
+    return sendResponse(c, 200, "Giriş başarılı", { token, user });
   } catch (error) {
     return sendResponse(c, 500, "Giriş sırasında bir hata oluştu.");
   }

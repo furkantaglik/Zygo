@@ -1,20 +1,20 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface ILike extends Document {
-  postId: mongoose.Types.ObjectId;
-  userId: mongoose.Types.ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
+  post: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 const LikeSchema: Schema = new Schema(
   {
-    postId: {
+    post: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Post",
       required: true,
     },
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,

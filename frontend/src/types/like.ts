@@ -1,7 +1,9 @@
+import { IPost } from "./post";
+
 export type ILike = {
   _id: string;
-  postId: string;
-  userId: string;
+  post: IPost;
+  user: IPost;
   createdAt: string;
   updatedAt: string;
 };

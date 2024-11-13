@@ -5,19 +5,17 @@ import fetcher from "./fetcher";
 // Hooks ------
 
 export function useGetAllUsers(): SWRResponse<IUser[]> {
-  return useSWR("/get-all-users", fetcher);
+  return useSWR("user/get-all-users", fetcher);
 }
 
 export function useGetUserById(userId: string): SWRResponse<IUser> {
-  return useSWR(`/get-by-userId/${userId}`, fetcher);
+  return useSWR(`user/get-by-userId/${userId}`, fetcher);
 }
 
-export function useGetUserByUsername(
-  username: string
-): SWRResponse<IUser, any> {
-  return useSWR(`/get-by-username/${username}`, fetcher);
+export function useGetUserByUsername(username: string): SWRResponse<IUser> {
+  return useSWR(`user/get-by-username/${username}`, fetcher);
 }
 
 export function useGetUserByEmail(email: string): SWRResponse<IUser> {
-  return useSWR(`/get-by-email/${email}`, fetcher);
+  return useSWR(`user/get-by-email/${email}`, fetcher);
 }
