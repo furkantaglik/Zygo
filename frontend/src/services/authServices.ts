@@ -1,36 +1,44 @@
-import useSWRMutation from "swr/mutation";
-import { axiosInstance } from "./fetcher";
+import { IUser } from "@/types/user";
+import { useMutation } from "@tanstack/react-query";
+import axiosInstance from "./axios";
 
-const registerRequest = async (
-  url: string,
-  { arg }: { arg: { username: string; email: string; password: string } }
-) => {
-  return (await axiosInstance.post(url, { ...arg })).data;
-};
-
-const loginRequest = async (
-  url: string,
-  { arg }: { arg: { emailOrUsername: string; password: string } }
-) => {
-  return (await axiosInstance.post(url, { ...arg })).data;
-};
-
-export function useRegister() {
-  return useSWRMutation("/auth/register", registerRequest, {
-    onError(error) {
-      console.error("Error registering user", error);
-    },
-    onSuccess: (data) => {
-      console.log("User registered successfully", data);
+export const useRegister = () => {
+  return useMutation<
+    ILoginResponse,
+    Error,
+    { username: string; password: string; email: string }
+  >({
+    mutationFn: async ({ username, password, email }) => {
+      const { data } = await axiosInstance.post<ILoginResponse>(
+        "/auth/register",
+        {
+          username,
+          password,
+          email,
+        }
+      );
+      return data;
     },
   });
-}
+};
 
-export function useLogin() {
-  return useSWRMutation("/auth/login", loginRequest, {
-    onError(error) {
-      console.error("Error logging in", error);
+export const useLogin = () => {
+  return useMutation<
+    ILoginResponse,
+    Error,
+    { emailOrUsername: string; password: string }
+  >({
+    mutationFn: async ({ emailOrUsername, password }) => {
+      const { data } = await axiosInstance.post<ILoginResponse>("/auth/login", {
+        emailOrUsername,
+        password,
+      });
+      return data;
     },
-    onSuccess(data) {},
   });
+};
+
+interface ILoginResponse {
+  user: IUser;
+  token: string;
 }

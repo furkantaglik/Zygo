@@ -4,7 +4,7 @@ import Avatar from "./avatar";
 const UserCard = ({ user }: { user: IUser }) => {
   return (
     <div className=" flex gap-x-2 items-center font-semibold ">
-      <Avatar size={50} />
+      <Avatar size={50} avatarUrl={user.avatar} />
       <h1>{user.username}</h1>
     </div>
   );

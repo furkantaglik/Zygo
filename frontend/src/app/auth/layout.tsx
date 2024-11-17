@@ -1,5 +1,5 @@
 "use client";
-import Spinner from "@/components/spinner";
+import Spinner from "@/components/_global/spinner";
 import { useAuthStore } from "@/lib/zustand/authStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

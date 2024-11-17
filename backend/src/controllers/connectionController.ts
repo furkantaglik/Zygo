@@ -5,118 +5,6 @@ import { User } from "../models/user.js";
 import { Types, startSession } from "mongoose";
 import { validateObjectId } from "../lib/utils/valideObjectId.js";
 
-export const sendRequest = async (c: Context) => {
-  const { receiverId } = c.req.param();
-  const requesterId = c.get("user").id;
-
-  if (requesterId === receiverId) {
-    return sendResponse(c, 400, "Kendini takip edemezsin.");
-  }
-
-  if (!validateObjectId(requesterId) || !validateObjectId(receiverId)) {
-    return sendResponse(c, 400, "Geçersiz kullanıcı ID.");
-  }
-
-  const existingRequest = await Connection.findOne({
-    requester: requesterId,
-    receiver: receiverId,
-  });
-
-  if (existingRequest) {
-    return sendResponse(
-      c,
-      400,
-      "Bu kullanıcıya zaten bir takip isteği gönderdiniz."
-    );
-  }
-
-  const newRequest = new Connection({
-    requester: requesterId,
-    receiver: receiverId,
-    status: "pending",
-  });
-
-  await newRequest.save();
-  return sendResponse(c, 200, "Takip isteği gönderildi.");
-};
-
-export const acceptRequest = async (c: Context) => {
-  const { requestId } = c.req.param();
-  const userId = c.get("user").id;
-
-  if (!validateObjectId(requestId) || !validateObjectId(userId)) {
-    return sendResponse(c, 400, "Geçersiz kullanıcı ID.");
-  }
-
-  const session = await startSession();
-  session.startTransaction();
-
-  try {
-    const request = await Connection.findById(requestId).session(session);
-    if (!request) {
-      return sendResponse(c, 404, "Takip isteği bulunamadı.");
-    }
-
-    if (
-      request.receiver.toString() !== userId ||
-      request.status !== "pending"
-    ) {
-      return sendResponse(
-        c,
-        400,
-        "Bu isteği kabul edemezsiniz veya zaten işlem yapılmış."
-      );
-    }
-
-    const [user, requester] = await Promise.all([
-      User.findById(userId).session(session),
-      User.findById(request.requester).session(session),
-    ]);
-
-    if (!user || !requester) throw new Error("Kullanıcı bulunamadı");
-
-    user.followers.push(request.requester);
-    requester.following.push(userId);
-    request.status = "accepted";
-
-    await Promise.all([
-      user.save({ session }),
-      requester.save({ session }),
-      request.save({ session }),
-    ]);
-    await session.commitTransaction();
-
-    return sendResponse(c, 200, "Takip isteği kabul edildi.");
-  } catch (error) {
-    await session.abortTransaction();
-    return sendResponse(c, 500, "Bir hata oluştu.");
-  } finally {
-    session.endSession();
-  }
-};
-
-export const rejectRequest = async (c: Context) => {
-  const { requestId } = c.req.param();
-  const userId = c.get("user").id;
-
-  if (!validateObjectId(requestId) || !validateObjectId(userId)) {
-    return sendResponse(c, 400, "Geçersiz kullanıcı ID.");
-  }
-
-  const request = await Connection.findById(requestId);
-  if (
-    !request ||
-    request.receiver.toString() !== userId ||
-    request.status !== "pending"
-  ) {
-    return sendResponse(c, 400, "İstek bulunamadı veya işlem yapılamaz.");
-  }
-
-  request.status = "rejected";
-  await request.save();
-  return sendResponse(c, 200, "Takip isteği reddedildi.");
-};
-
 export const unfollow = async (c: Context) => {
   const { userId } = c.req.param();
   const currentUserId = c.get("user").id;
@@ -213,11 +101,165 @@ export const removeFollower = async (c: Context) => {
   }
 };
 
+export const sendRequest = async (c: Context) => {
+  const { receiverId } = c.req.param();
+  const requesterId = c.get("user").id;
+
+  if (requesterId === receiverId) {
+    return sendResponse(c, 400, "Kendini takip edemezsin.");
+  }
+
+  if (!validateObjectId(requesterId) || !validateObjectId(receiverId)) {
+    return sendResponse(c, 400, "Geçersiz kullanıcı ID.");
+  }
+
+  const receiver = await User.findById(receiverId);
+  if (!receiver) {
+    return sendResponse(c, 404, "Kullanıcı bulunamadı.");
+  }
+
+  if (!receiver.private) {
+    const session = await startSession();
+    session.startTransaction();
+    try {
+      const [requester, receiverUser] = await Promise.all([
+        User.findById(requesterId).session(session),
+        User.findById(receiverId).session(session),
+      ]);
+
+      if (!requester || !receiverUser) throw new Error("Kullanıcı bulunamadı.");
+
+      if (
+        requester.following.includes(receiverUser._id as Types.ObjectId) ||
+        receiverUser.followers.includes(requester._id as Types.ObjectId)
+      ) {
+        return sendResponse(c, 400, "Zaten takip ediyorsunuz.");
+      }
+
+      requester.following.push(new Types.ObjectId(receiverId));
+      receiverUser.followers.push(requesterId);
+
+      await Promise.all([
+        requester.save({ session }),
+        receiverUser.save({ session }),
+      ]);
+      await session.commitTransaction();
+
+      return sendResponse(c, 200, "Kullanıcı başarıyla takip edildi.");
+    } catch (error) {
+      await session.abortTransaction();
+      return sendResponse(c, 500, "Bir hata oluştu.");
+    } finally {
+      session.endSession();
+    }
+  }
+
+  const existingRequest = await Connection.findOne({
+    requester: requesterId,
+    receiver: receiverId,
+  });
+
+  if (existingRequest) {
+    return sendResponse(
+      c,
+      400,
+      "Bu kullanıcıya zaten bir takip isteği gönderdiniz."
+    );
+  }
+
+  const newRequest = new Connection({
+    requester: requesterId,
+    receiver: receiverId,
+    status: "pending", // Takip isteği "pending" olarak oluşturulacak
+  });
+
+  await newRequest.save();
+  return sendResponse(c, 200, "Takip isteği gönderildi.");
+};
+
+export const acceptRequest = async (c: Context) => {
+  const { requestId } = c.req.param();
+  const userId = c.get("user").id;
+
+  if (!validateObjectId(requestId) || !validateObjectId(userId)) {
+    return sendResponse(c, 400, "Geçersiz kullanıcı ID.");
+  }
+
+  const session = await startSession();
+  session.startTransaction();
+
+  try {
+    const request = await Connection.findById(requestId).session(session);
+    if (!request) {
+      return sendResponse(c, 404, "Takip isteği bulunamadı.");
+    }
+
+    if (
+      request.receiver.toString() !== userId ||
+      request.status !== "pending"
+    ) {
+      return sendResponse(
+        c,
+        400,
+        "Bu isteği kabul edemezsiniz veya zaten işlem yapılmış."
+      );
+    }
+
+    const [user, requester] = await Promise.all([
+      User.findById(userId).session(session),
+      User.findById(request.requester).session(session),
+    ]);
+
+    if (!user || !requester) throw new Error("Kullanıcı bulunamadı");
+
+    user.followers.push(request.requester);
+    requester.following.push(userId);
+    request.status = "accepted";
+
+    await Promise.all([
+      user.save({ session }),
+      requester.save({ session }),
+      request.save({ session }),
+    ]);
+    await session.commitTransaction();
+
+    return sendResponse(c, 200, "Takip isteği kabul edildi.");
+  } catch (error) {
+    await session.abortTransaction();
+    return sendResponse(c, 500, "Bir hata oluştu.");
+  } finally {
+    session.endSession();
+  }
+};
+
+export const rejectRequest = async (c: Context) => {
+  const { requestId } = c.req.param();
+  const userId = c.get("user").id;
+
+  if (!validateObjectId(requestId) || !validateObjectId(userId)) {
+    return sendResponse(c, 400, "Geçersiz kullanıcı ID.");
+  }
+
+  const request = await Connection.findById(requestId);
+  if (
+    !request ||
+    request.receiver.toString() !== userId ||
+    request.status !== "pending"
+  ) {
+    return sendResponse(c, 400, "İstek bulunamadı veya işlem yapılamaz.");
+  }
+
+  request.status = "rejected";
+  await request.save();
+  return sendResponse(c, 200, "Takip isteği reddedildi.");
+};
+
 export const getRequests = async (c: Context) => {
   const userId = c.get("user").id;
 
   const requests = await Connection.find({
     $or: [{ requester: userId }, { receiver: userId }],
+    status: "pending",
   }).populate("requester receiver");
 
   return sendResponse(c, 200, "Takip istekleri", requests);

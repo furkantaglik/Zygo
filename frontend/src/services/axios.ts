@@ -4,7 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 export const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000/api/",
+  baseURL: "http://localhost:5000/api",
 });
 
 axiosInstance.interceptors.request.use((config) => {
@@ -21,16 +21,10 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     const errorMessage =
-      error.response?.data?.message || "Bir sunucu hatası oluştu";
+      error.response?.data?.message || "Beklenmeyen bir hata oluştu";
     toast.error(errorMessage);
     console.error(error);
     return Promise.reject(error);
   }
 );
-
-const fetcher = async (endpoint: string) => {
-  const response = await axiosInstance.get(endpoint);
-  return response.data;
-};
-
-export default fetcher;
+export default axiosInstance;

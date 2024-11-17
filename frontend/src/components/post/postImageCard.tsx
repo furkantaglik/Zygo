@@ -25,11 +25,11 @@ const PostImageCard = ({
       />
       {post.mediaType === "video" ? (
         <span className="absolute top-2 right-2  ">
-          <Play fill="white" />
+          <Play />
         </span>
       ) : (
         <span className="absolute top-2 right-2 ">
-          <Image fill="white" />
+          <Image />
         </span>
       )}
     </div>

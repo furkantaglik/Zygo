@@ -11,7 +11,8 @@ import {
   User,
 } from "lucide-react";
 import { useAuthStore } from "@/lib/zustand/authStore";
-import Avatar from "./user/avatar";
+import Avatar from "../user/avatar";
+import { GetUserById } from "@/services/userServices";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -31,6 +32,7 @@ const Navbar = () => {
       : "";
 
   const { user } = useAuthStore();
+  const { data: userData } = GetUserById(user!._id);
 
   return (
     <>
@@ -56,18 +58,18 @@ const Navbar = () => {
           ))}
         </ul>
         <Link
-          href={`/${user?.username}`}
+          href={`/${userData?.username}`}
           className={`p-2 mb-5 hover:bg-accent mx-2 rounded cursor-pointer transition-all flex items-center gap-x-2 mt-auto text-lg ${isActive(
-            "/" + user?.username
+            "/" + userData?.username
           )}`}
         >
-          <Avatar size={30} />
+          <Avatar size={30} avatarUrl={userData?.avatar} />
           Profile
         </Link>
       </div>
 
       {/* Mobile Navbar */}
-      <div className="lg:hidden fixed bottom-0 left-0 w-full p-4 border-t border-accent  bg-background z-50 mt-10 ">
+      <div className="lg:hidden fixed bottom-0 left-0 w-full p-4 border-t border-accent bg-background z-30">
         <ul className="flex justify-around">
           {menuItems.slice(0, -1).map(({ href, label, icon }) => (
             <Link
@@ -79,10 +81,10 @@ const Navbar = () => {
             </Link>
           ))}
           <Link
-            href={`/${user?.username}`}
+            href={`/${userData?.username}`}
             className={`hover:scale-110 transition-all`}
           >
-            <Avatar size={30} />
+            <Avatar size={30} avatarUrl={userData?.avatar} />
           </Link>
         </ul>
       </div>

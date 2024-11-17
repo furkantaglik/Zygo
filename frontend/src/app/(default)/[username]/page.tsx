@@ -1,12 +1,12 @@
 "use client";
 import PostImageCard from "@/components/post/postImageCard";
 import PostModal from "@/components/post/postModal";
-import Spinner from "@/components/spinner";
-import { useGetUserPosts } from "@/services/postServices";
+import Spinner from "@/components/_global/spinner";
+import { GetUserPosts } from "@/services/postServices";
 import { IPost } from "@/types/post";
 import React, { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useGetUserByUsername } from "@/services/userServices";
+import { GetUserByUsername } from "@/services/userServices";
 import { useAuthStore } from "@/lib/zustand/authStore";
 
 export default function PostPage() {
@@ -15,8 +15,9 @@ export default function PostPage() {
   const searchParams = useSearchParams();
   const postId = searchParams.get("p");
   const normalizedPathname = pathname.replace(/^\/+/, "");
-  const { data: user } = useGetUserByUsername(normalizedPathname);
-  const { data, error, isLoading } = useGetUserPosts(user?._id);
+  const { data: userData } = GetUserByUsername(normalizedPathname);
+  const { user: currentUser } = useAuthStore();
+  const { data, isLoading, error } = GetUserPosts(userData!._id);
   const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -31,6 +32,9 @@ export default function PostPage() {
     setIsOpen(false);
     router.push(pathname);
   };
+  useEffect(() => {
+    closeModal();
+  }, [normalizedPathname]);
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
@@ -68,7 +72,12 @@ export default function PostPage() {
       </section>
 
       {isOpen && selectedPost && (
-        <PostModal post={selectedPost} user={user!} onClose={closeModal} />
+        <PostModal
+          post={selectedPost}
+          currentUser={currentUser!}
+          user={userData!}
+          onClose={closeModal}
+        />
       )}
     </>
   );

@@ -3,6 +3,48 @@ import { User } from "../models/user.js";
 import { sendResponse } from "../lib/utils/sendResponse.js";
 import { Types } from "mongoose";
 
+export const updateUser = async (c: Context) => {
+  const file = await c.get("file");
+  const { userId } = c.req.param();
+  const { user } = await c.req.parseBody();
+
+  let parsedUser;
+
+  if (typeof user === "string") {
+    parsedUser = JSON.parse(user);
+  }
+
+  if (!userId || !Types.ObjectId.isValid(userId)) {
+    return sendResponse(c, 400, "Geçersiz veya eksik kullanıcı ID.");
+  }
+
+  if (parsedUser.username) {
+    const existingUser = await User.findOne({ username: parsedUser.username });
+    if (existingUser && existingUser._id!.toString() !== userId) {
+      return sendResponse(c, 400, "Bu kullanıcı adı zaten alınmış.");
+    }
+  }
+
+  if (file?.path) {
+    parsedUser.avatar = file.path;
+  }
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(userId, { ...parsedUser });
+    if (!updatedUser) {
+      return sendResponse(c, 404, "Kullanıcı bulunamadı.");
+    }
+    return sendResponse(
+      c,
+      200,
+      "Kullanıcı başarıyla güncellendi.",
+      updatedUser
+    );
+  } catch (error) {
+    return sendResponse(c, 500, "Kullanıcı güncellenirken bir hata oluştu.");
+  }
+};
+
 export const getAllUsers = async (c: Context) => {
   const users = await User.find();
   return sendResponse(c, 200, "Kullanıcılar başarıyla getirildi.", users);

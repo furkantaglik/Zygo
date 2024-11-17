@@ -1,6 +1,6 @@
 "use client";
 import ProtectedLayout from "@/components/auth/protectedLayout";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/_global/navbar";
 
 export default function Layout({
   children,

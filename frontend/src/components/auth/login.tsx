@@ -18,7 +18,7 @@ const Login = () => {
   });
 
   const router = useRouter();
-  const { trigger, isMutating } = useLogin();
+  const { mutateAsync, isPending } = useLogin();
   const { isAuthenticated, setUser, setToken, token } = useAuthStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,10 +28,18 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const response = await trigger(formData);
-    setUser(response.user);
-    setToken(response.token);
-    router.push("/");
+
+    const { emailOrUsername, password } = formData;
+
+    const response = await mutateAsync({ emailOrUsername, password });
+
+    if (response) {
+      const { user, token } = response;
+
+      setUser(user);
+      setToken(token);
+      router.push("/");
+    }
   };
 
   return (
@@ -70,7 +78,7 @@ const Login = () => {
           <button
             type="submit"
             className="p-1 bg-accent rounded font-semibold"
-            disabled={isMutating}
+            disabled={isPending}
           >
             Giriş Yap
           </button>

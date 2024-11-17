@@ -15,7 +15,6 @@ export const createPost = async (c: Context) => {
   try {
     const file = await c.get("file");
     const { content } = await c.req.parseBody();
-    console.log(content);
 
     if (!file || !file.path) {
       return sendResponse(c, 400, "Dosya yüklenmedi.");

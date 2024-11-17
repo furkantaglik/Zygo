@@ -1,6 +1,6 @@
-import { timeAgo } from "@/lib/timeAgo";
-import { useCreateComment } from "@/services/commentServices";
-import { useCreateLike, useDeleteLike } from "@/services/likeServices";
+import { timeAgo } from "@/lib/utils/timeAgo";
+import { CreateComment } from "@/services/commentServices";
+import { CreateLike, DeleteLike } from "@/services/likeServices";
 import { IComment } from "@/types/comment";
 import { ILike } from "@/types/like";
 import { IPost } from "@/types/post";
@@ -19,9 +19,9 @@ const PostBottom = ({
   comments: IComment[];
 }) => {
   const [newComment, setNewComment] = useState("");
-  const { trigger: commentTrigger } = useCreateComment(post._id);
-  const { trigger: likeTrigger } = useCreateLike(post._id);
-  const { trigger: removeLikeTrigger } = useDeleteLike(post._id);
+  const { mutate: createLikeMutate } = CreateLike();
+  const { mutate: deleteLikeMutate } = DeleteLike();
+  const { mutate: CreateCommentMutate } = CreateComment();
 
   const likedPost = likes?.find((like) => like.user._id === userId);
   const hasLiked = !!likedPost;
@@ -29,15 +29,15 @@ const PostBottom = ({
 
   const handleLikeToggle = async () => {
     if (hasLiked && likeId) {
-      await removeLikeTrigger({ likeId });
+      deleteLikeMutate(likeId);
     } else {
-      await likeTrigger({ postId: post._id });
+      createLikeMutate({ postId: post._id });
     }
   };
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) return;
-    await commentTrigger({ content: newComment, postId: post._id });
+    CreateCommentMutate({ content: newComment, postId: post._id });
     setNewComment("");
   };
 

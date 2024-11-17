@@ -18,36 +18,35 @@ export const uploadFile = async (c: Context, next: Next) => {
   const file = formData.image as File;
 
   if (!file) {
-    return sendResponse(c, 400, "No file uploaded");
-  }
-
-  const mimeType = file.type;
-  const supportedTypes = [
-    "image/jpeg",
-    "image/png",
-    "image/gif",
-    "image/jpg",
-    "image/wepb",
-    "video/mp4",
-    "video/webm",
-    "video/avi",
-    "video/mov",
-  ];
-
-  if (!supportedTypes.includes(mimeType)) {
-    return sendResponse(c, 403, "Desteklenmeyen medya biçimi");
+    return next();
   }
 
   try {
-    const buffer = Buffer.from(await file.arrayBuffer());
+    const mimeType = file.type;
+    const supportedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/jpg",
+      "image/webp",
+      "video/mp4",
+      "video/webm",
+      "video/avi",
+      "video/mov",
+    ];
 
+    if (!supportedTypes.includes(mimeType)) {
+      return sendResponse(c, 403, "Desteklenmeyen medya biçimi");
+    }
+
+    const buffer = Buffer.from(await file.arrayBuffer());
     const bufferStream = new Readable();
     bufferStream.push(buffer);
     bufferStream.push(null);
 
     const cloudinaryResponse = await new Promise<CloudinaryResponse>(
       (resolve, reject) => {
-        const streamUpload = cloudinary.uploader.upload_stream(
+        const uploadStream = cloudinary.uploader.upload_stream(
           { resource_type: mimeType.startsWith("video/") ? "video" : "image" },
           (error, result) => {
             if (error) {
@@ -56,8 +55,7 @@ export const uploadFile = async (c: Context, next: Next) => {
             resolve(result as CloudinaryResponse);
           }
         );
-
-        bufferStream.pipe(streamUpload);
+        bufferStream.pipe(uploadStream);
       }
     );
 
@@ -65,11 +63,10 @@ export const uploadFile = async (c: Context, next: Next) => {
       path: cloudinaryResponse.secure_url,
       mediaType: cloudinaryResponse.resource_type,
     });
-    console.log(cloudinaryResponse);
-
-    await next();
   } catch (err) {
     console.error("Dosya yüklenirken bir hata oluştu:", err);
     return sendResponse(c, 500, "Dosya yüklenirken bir hata oluştu.");
+  } finally {
+    await next();
   }
 };

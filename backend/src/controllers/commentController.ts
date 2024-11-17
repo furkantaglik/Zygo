@@ -83,7 +83,7 @@ export const getCommentsByPostId = async (c: Context) => {
   try {
     const comments = await Comment.find({ post: postId })
 
-      .populate("user", "username")
+      .populate("user", "username avatar")
       .sort({ createdAt: -1 });
 
     return sendResponse(c, 200, "Yorumlar başarıyla getirildi.", comments);

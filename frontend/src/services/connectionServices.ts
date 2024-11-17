@@ -1,112 +1,82 @@
-import useSWR, { SWRResponse, mutate } from "swr";
-import fetcher, { axiosInstance } from "./fetcher";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import axiosInstance from "./axios";
+import { IUser } from "@/types/user";
 import { IConnection } from "@/types/connection";
-import useSWRMutation from "swr/mutation";
 
-async function sendRequest(
-  url: string,
-  { arg }: { arg: { receiverId: string } }
-) {
-  return await axiosInstance.get(`${url}/${arg.receiverId}`);
-}
-
-async function acceptRequest(
-  url: string,
-  { arg }: { arg: { requestId: string } }
-) {
-  return await axiosInstance.get(`${url}/${arg.requestId}`);
-}
-
-async function rejectRequest(
-  url: string,
-  { arg }: { arg: { requestId: string } }
-) {
-  return await axiosInstance.get(`${url}/${arg.requestId}`);
-}
-
-async function unfollow(url: string, { arg }: { arg: { userId: string } }) {
-  return await axiosInstance.get(`${url}/${arg.userId}`);
-}
-
-async function removeFollower(
-  url: string,
-  { arg }: { arg: { userId: string } }
-) {
-  return await axiosInstance.get(`${url}/${arg.userId}`);
-}
-
-// Hooks ------
-
-export function useGetFollowing(userId: string): SWRResponse<IConnection[]> {
-  return useSWR(`connection/get-following/${userId}`, fetcher);
-}
-
-export function useGetFollowers(
-  userId: string | undefined
-): SWRResponse<IConnection[]> {
-  return useSWR(userId ? `connection/get-followers/${userId}` : null, fetcher);
-}
-
-export function useGetRequests(): SWRResponse<IConnection[]> {
-  return useSWR(`connection/get-requests`, fetcher);
-}
-
-export function useSendRequest() {
-  const { mutate } = useGetRequests();
-  return useSWRMutation("connection/send-request", sendRequest, {
-    onError(error) {
-      console.error("Error sending request", error);
-    },
-    onSuccess: () => {
-      mutate();
+export const SendRequest = () => {
+  return useMutation<void, Error, { receiverId: string }>({
+    mutationFn: async ({ receiverId }: { receiverId: string }) => {
+      await axiosInstance.get(`/connection/send-request/${receiverId}`);
     },
   });
-}
+};
 
-export function useAcceptRequest() {
-  const { mutate } = useGetRequests();
-  return useSWRMutation("connection/accept-request", acceptRequest, {
-    onError(error) {
-      console.error("Error accepting request", error);
-    },
-    onSuccess: () => {
-      mutate();
+export const AcceptRequest = () => {
+  return useMutation<void, Error, { requestId: string }>({
+    mutationFn: async ({ requestId }: { requestId: string }) => {
+      await axiosInstance.get(`/connection/accept-request/${requestId}`);
     },
   });
-}
+};
 
-export function useRejectRequest() {
-  const { mutate } = useGetRequests();
-  return useSWRMutation("connection/reject-request", rejectRequest, {
-    onError(error) {
-      console.error("Error rejecting request", error);
-    },
-    onSuccess: () => {
-      mutate();
+export const RejectRequest = () => {
+  return useMutation<void, Error, { requestId: string }>({
+    mutationFn: async ({ requestId }: { requestId: string }) => {
+      await axiosInstance.get(`/connection/reject-request/${requestId}`);
     },
   });
-}
+};
 
-export function useUnfollow(userId: string) {
-  const { mutate } = useGetFollowing(userId);
-  return useSWRMutation("connection/unfollow", unfollow, {
-    onError(error) {
-      console.error("Error unfollowing user", error);
-    },
-    onSuccess: () => {
-      mutate();
+export const Unfollow = () => {
+  return useMutation<void, Error, { userId: string }>({
+    mutationFn: async ({ userId }: { userId: string }) => {
+      await axiosInstance.get(`/connection/unfollow/${userId}`);
     },
   });
-}
+};
 
-export function useRemoveFollower(userId: string) {
-  const { mutate } = useGetFollowers(userId);
-  return useSWRMutation("connection/remove-follower", removeFollower, {
-    onError(error) {
-      console.error("Error removing follower", error);
-    },
-    onSuccess: () => {
-      mutate();
+export const RemoveFollower = () => {
+  return useMutation<void, Error, { userId: string }>({
+    mutationFn: async ({ userId }: { userId: string }) => {
+      await axiosInstance.get(`/connection/remove-follower/${userId}`);
     },
   });
-}
+};
+
+export const GetRequests = () => {
+  return useQuery<IConnection[], Error>({
+    queryKey: ["requests"],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get<IConnection[]>(
+        "/connection/get-requests"
+      );
+      return data;
+    },
+  });
+};
+
+export const GetFollowers = (userId: string) => {
+  return useQuery<IUser[], Error>({
+    queryKey: ["followers", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await axiosInstance.get<IUser[]>(
+        `/connection/get-followers/${userId}`
+      );
+      return data;
+    },
+  });
+};
+
+export const GetFollowing = (userId: string) => {
+  return useQuery<IUser[], Error>({
+    queryKey: ["following", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await axiosInstance.get<IUser[]>(
+        `/connection/get-following/${userId}`
+      );
+      return data;
+    },
+  });
+};

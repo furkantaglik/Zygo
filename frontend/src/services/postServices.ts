@@ -1,76 +1,83 @@
-import useSWR, { mutate, SWRResponse } from "swr";
-import useSWRMutation from "swr/mutation";
-import { axiosInstance } from "./fetcher";
 import { IPost } from "@/types/post";
-import fetcher from "./fetcher";
-import { useGetUserByUsername } from "./userServices";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axiosInstance from "./axios";
 
-const createPost = async (url: string, { arg }: { arg: { post: IPost } }) => {
-  return await axiosInstance.post(url, arg.post);
-};
-
-const deletePost = async (
-  url: string,
-  { arg }: { arg: { postId: string } }
-) => {
-  return await axiosInstance.get(`${url}/${arg.postId}`);
-};
-
-const updatePost = async (url: string, { arg }: { arg: { post: IPost } }) => {
-  return await axiosInstance.post(url, arg.post);
-};
-
-// Hooks ------
-
-export function useGetAllPosts(): SWRResponse<IPost[]> {
-  return useSWR("post/get-all-posts", fetcher);
-}
-
-export function useGetUserPosts(
-  userId: string | undefined
-): SWRResponse<IPost[]> {
-  return useSWR(userId ? `post/get-user-posts/${userId}` : null, fetcher);
-}
-
-export function useGetPostById(postId: string): SWRResponse<IPost> {
-  return useSWR(`post/get-by-postId/${postId}`, fetcher);
-}
-
-export function useCreatePost() {
-  const { mutate } = useGetAllPosts();
-
-  return useSWRMutation("post/create-post", createPost, {
-    onError(error) {
-      console.error("Error creating post", error);
-    },
-    onSuccess: () => {
-      mutate();
+export const GetAllPosts = () => {
+  return useQuery<IPost[], Error>({
+    queryKey: ["posts"],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get<IPost[]>("/post/get-all-posts");
+      return data;
     },
   });
-}
+};
 
-export function useUpdatePost() {
-  const { mutate } = useGetAllPosts();
-
-  return useSWRMutation("post/update-post", updatePost, {
-    onError(error) {
-      console.error("Error updating post", error);
-    },
-    onSuccess: () => {
-      mutate();
-    },
-  });
-}
-
-export function useDeletePost() {
-  const { mutate } = useGetAllPosts();
-
-  return useSWRMutation("post/delete-post", deletePost, {
-    onError(error) {
-      console.error("Error deleting post", error);
-    },
-    onSuccess: () => {
-      mutate();
+export const GetUserPosts = (userId: string) => {
+  return useQuery<IPost[], Error>({
+    queryKey: ["userPosts", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await axiosInstance.get<IPost[]>(
+        `/post/get-user-posts/${userId}`
+      );
+      return data;
     },
   });
-}
+};
+
+export const GetPostById = (postId: string) => {
+  return useQuery<IPost, Error>({
+    queryKey: ["post", postId],
+    enabled: !!postId,
+    queryFn: async () => {
+      const { data } = await axiosInstance.get<IPost>(
+        `/post/get-by-postId/${postId}`
+      );
+      return data;
+    },
+  });
+};
+
+export const CreatePost = () => {
+  const queryClient = useQueryClient();
+  return useMutation<IPost, Error, IPost>({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userPosts"] });
+    },
+    mutationFn: async (newPost: IPost) => {
+      const { data } = await axiosInstance.post<IPost>(
+        "/post/create-post",
+        newPost
+      );
+      return data;
+    },
+  });
+};
+
+export const UpdatePost = () => {
+  const queryClient = useQueryClient();
+  return useMutation<IPost, Error, IPost>({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userPosts"] });
+    },
+    mutationFn: async (updatedPost: IPost) => {
+      const { data } = await axiosInstance.post<IPost>(
+        "/post/update-post",
+        updatedPost
+      );
+      return data;
+    },
+  });
+};
+
+export const DeletePost = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, string>({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userPosts"] });
+    },
+    mutationFn: async (postId: string) => {
+      await axiosInstance.get(`/post/delete-post/${postId}`);
+    },
+  });
+};

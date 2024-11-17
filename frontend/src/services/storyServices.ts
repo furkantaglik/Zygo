@@ -1,53 +1,56 @@
-import useSWR, { SWRResponse, mutate } from "swr";
-import { axiosInstance } from "./fetcher";
 import { IStory } from "@/types/story";
-import fetcher from "./fetcher";
-import useSWRMutation from "swr/mutation";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axiosInstance from "./axios";
 
-const createStory = async (
-  url: string,
-  { arg }: { arg: { story: IStory } }
-) => {
-  return await axiosInstance.post(url, arg.story);
-};
-
-const deleteStory = async (
-  url: string,
-  { arg }: { arg: { storyId: string } }
-) => {
-  return await axiosInstance.get(`${url}/${arg.storyId}`);
-};
-
-// Hooks ------
-
-export function useGetAllStories(): SWRResponse<IStory[]> {
-  return useSWR("story/get-all-stories", fetcher);
-}
-
-export function useGetUserStories(userId: string): SWRResponse<IStory[]> {
-  return useSWR(`story/get-user-stories/${userId}`, fetcher);
-}
-
-export function useCreateStory() {
-  const { mutate } = useGetAllStories();
-  return useSWRMutation("story/create-story", createStory, {
-    onError(error) {
-      console.error("Error creating story", error);
-    },
-    onSuccess: () => {
-      mutate();
+export const GetAllStories = () => {
+  return useQuery<IStory[], Error>({
+    queryKey: ["stories"],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get<IStory[]>(
+        "/story/get-all-stories"
+      );
+      return data;
     },
   });
-}
+};
 
-export function useDeleteStory() {
-  const { mutate } = useGetAllStories();
-  return useSWRMutation("story/delete-story", deleteStory, {
-    onError(error) {
-      console.error("Error deleting story", error);
-    },
-    onSuccess: () => {
-      mutate();
+export const GetUserStories = (userId: string) => {
+  return useQuery<IStory[], Error>({
+    queryKey: ["userStories", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await axiosInstance.get<IStory[]>(
+        `/story/get-user-stories/${userId}`
+      );
+      return data;
     },
   });
-}
+};
+
+export const CreateStory = () => {
+  const queryClient = useQueryClient();
+  return useMutation<IStory, Error, IStory>({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userStories"] });
+    },
+    mutationFn: async (newStory: IStory) => {
+      const { data } = await axiosInstance.post<IStory>(
+        "/story/create-story",
+        newStory
+      );
+      return data;
+    },
+  });
+};
+
+export const DeleteStory = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, string>({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userStories"] });
+    },
+    mutationFn: async (storyId: string) => {
+      await axiosInstance.get(`/story/delete-story/${storyId}`);
+    },
+  });
+};

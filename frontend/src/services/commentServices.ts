@@ -1,71 +1,60 @@
-import useSWR, { mutate, SWRResponse } from "swr";
-import useSWRMutation from "swr/mutation";
-import { axiosInstance } from "./fetcher";
 import { IComment } from "@/types/comment";
-import fetcher from "./fetcher";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axiosInstance from "./axios";
 
-const createComment = async (
-  url: string,
-  { arg }: { arg: { content: string; postId: string } }
-) => {
-  return await axiosInstance.post(url, { ...arg });
-};
-
-const updateComment = async (
-  url: string,
-  { arg }: { arg: { comment: IComment } }
-) => {
-  return await axiosInstance.post(url, arg.comment);
-};
-
-const deleteComment = async (
-  url: string,
-  { arg }: { arg: { commentId: string } }
-) => {
-  return await axiosInstance.get(`${url}/${arg.commentId}`);
-};
-
-// Hooks ------
-
-export function useGetComments(postId: string): SWRResponse<IComment[]> {
-  return useSWR(`comment/get-post-comments/${postId}`, fetcher);
-}
-
-export function useCreateComment(postId: string) {
-  const { mutate } = useGetComments(postId);
-
-  return useSWRMutation("comment/create-comment", createComment, {
-    onError(error) {
-      console.error("Error creating comment", error);
-    },
+export const CreateComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation<IComment, Error, { content: string; postId: string }>({
     onSuccess: () => {
-      mutate();
+      queryClient.invalidateQueries({ queryKey: ["postComments"] });
+    },
+    mutationFn: async (comment: { content: string; postId: string }) => {
+      const { data } = await axiosInstance.post<IComment>(
+        "/comment/create-comment",
+        comment
+      );
+      return data;
     },
   });
-}
+};
 
-export function useUpdateComment(postId: string) {
-  const { mutate } = useGetComments(postId);
-
-  return useSWRMutation("comment/update-comment", updateComment, {
-    onError(error) {
-      console.error("Error updating comment", error);
-    },
+export const UpdateComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation<IComment, Error, IComment>({
     onSuccess: () => {
-      mutate();
+      queryClient.invalidateQueries({ queryKey: ["postComments"] });
+    },
+    mutationFn: async (updatedComment: IComment) => {
+      const { data } = await axiosInstance.post<IComment>(
+        "/comment/update-comment",
+        updatedComment
+      );
+      return data;
     },
   });
-}
+};
 
-export function useDeleteComment(postId: string, commentId: string) {
-  const { mutate } = useGetComments(postId);
-
-  return useSWRMutation("comment/delete-comment", deleteComment, {
-    onError(error) {
-      console.error("Error deleting comment", error);
+export const DeleteComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, string>({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["postComments"] });
     },
-    onSuccess: async () => {
-      mutate();
+    mutationFn: async (commentId: string) => {
+      await axiosInstance.get(`/comment/delete-comment/${commentId}`);
     },
   });
-}
+};
+
+export const GetCommentsByPostId = (postId: string) => {
+  return useQuery<IComment[], Error>({
+    queryKey: ["postComments", postId],
+    enabled: !!postId,
+    queryFn: async () => {
+      const { data } = await axiosInstance.get<IComment[]>(
+        `/comment/get-post-comments/${postId}`
+      );
+      return data;
+    },
+  });
+};

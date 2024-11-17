@@ -1,13 +1,9 @@
-import type { Metadata } from "next";
+"use client";
 import "./globals.css";
-import SWRProvider from "./SWRProvider";
 import { Toaster } from "react-hot-toast";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-export const metadata: Metadata = {
-  title: "Zygo",
-  description: "Sosyal Medya",
-};
-
+const queryClient = new QueryClient();
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -16,8 +12,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Toaster position="bottom-center" reverseOrder={false} />
-        <SWRProvider>{children}</SWRProvider>
+        <QueryClientProvider client={queryClient}>
+          <Toaster position="bottom-center" reverseOrder={false} />
+          {children}
+        </QueryClientProvider>
       </body>
     </html>
   );

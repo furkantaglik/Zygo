@@ -1,7 +1,7 @@
 import { useAuthStore } from "@/lib/zustand/authStore";
 import { useRouter } from "next/navigation";
 import { useEffect, ComponentType, PropsWithChildren } from "react";
-import Spinner from "../spinner";
+import Spinner from "../_global/spinner";
 
 const withAuth = <P extends object>(Component: ComponentType<P>) => {
   return (props: PropsWithChildren<P>) => {

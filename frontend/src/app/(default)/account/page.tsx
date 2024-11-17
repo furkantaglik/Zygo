@@ -1,82 +1,153 @@
 "use client";
-import Spinner from "@/components/spinner";
+import Spinner from "@/components/_global/spinner";
 import Avatar from "@/components/user/avatar";
 import { useAuthStore } from "@/lib/zustand/authStore";
-import { useGetUserById } from "@/services/userServices";
-import React from "react";
+import { GetUserById, UpdateUser } from "@/services/userServices";
+import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const AccountPage = () => {
   const { user, loading } = useAuthStore();
-  const { data: userData, isLoading } = useGetUserById(user!._id);
+  const { data: userData, isLoading } = GetUserById(user!._id);
+  const { mutate, isPending } = UpdateUser();
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null | undefined>(
+    null
+  );
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    username: "",
+    email: "",
+    bio: "",
+  });
 
-  if (loading || isLoading) {
-    <Spinner />;
-  }
+  useEffect(() => {
+    if (userData) {
+      setFormData({
+        firstName: userData.firstName || "",
+        lastName: userData.lastName || "",
+        username: userData.username || "",
+        email: userData.email || "",
+        bio: userData.bio || "",
+      });
+      setAvatarPreview(userData.avatar);
+    }
+  }, [userData]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setAvatarFile(file);
+      setAvatarPreview(URL.createObjectURL(file));
+    }
+  };
+  const handleAvatarClick = () => {
+    document.getElementById("avatarInput")?.click();
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const data = new FormData();
+    data.append("user", JSON.stringify(formData));
+    if (avatarFile) data.append("image", avatarFile);
+
+    mutate(data);
+    toast.success("Profil Güncellendi");
+  };
+
+  if (loading || isLoading) return <Spinner />;
+
   return (
     <section className="max-w-screen-md mx-auto md:border border-accent rounded md:p-3 pt-3 mb-10">
-      <h1 className="text-lg font-semibold text-center   ">Profili Düzenle</h1>
-      <form className="flex flex-col w-96 mx-auto mt-5 gap-y-10">
+      <h1 className="text-lg font-semibold text-center">Profili Düzenle</h1>
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col md:mx-10 mt-5 gap-y-10"
+      >
         <div className="flex flex-col mx-auto">
-          <Avatar size={250} />
+          <div className="cursor-pointer" onClick={handleAvatarClick}>
+            <Avatar size={250} avatarUrl={avatarPreview} />
+          </div>
+          <input
+            type="file"
+            className="hidden"
+            id="avatarInput"
+            onChange={handleAvatarChange}
+          />
         </div>
         <div className="flex flex-col">
-          <label htmlFor="firstName" className="font-semibold mb-1 text-lg ">
+          <label htmlFor="firstName" className="font-semibold mb-1 text-lg">
             İsim
           </label>
           <input
             type="text"
             name="firstName"
-            placeholder={userData?.firstName}
-            className="bg-transparent ring-0  border-b border-primary outline-none rounded p-1"
+            value={formData.firstName}
+            onChange={handleChange}
+            className="bg-transparent ring-0 border-b border-primary outline-none rounded p-1"
           />
         </div>
         <div className="flex flex-col">
-          <label htmlFor="lastName" className="font-semibold mb-1 text-lg ">
+          <label htmlFor="lastName" className="font-semibold mb-1 text-lg">
             Soyisim
           </label>
           <input
             type="text"
             name="lastName"
-            placeholder={userData?.lastName}
-            className="bg-transparent ring-0  border-b border-primary outline-none rounded p-1"
+            value={formData.lastName}
+            onChange={handleChange}
+            className="bg-transparent ring-0 border-b border-primary outline-none rounded p-1"
           />
         </div>
         <div className="flex flex-col">
-          <label htmlFor="username" className="font-semibold mb-1 text-lg ">
+          <label htmlFor="username" className="font-semibold mb-1 text-lg">
             Kullanıcı Adı
           </label>
           <input
             type="text"
             name="username"
-            placeholder={userData?.username}
-            className="bg-transparent ring-0  border-b border-primary outline-none rounded p-1"
+            value={formData.username}
+            onChange={handleChange}
+            className="bg-transparent ring-0 border-b border-primary outline-none rounded p-1"
           />
         </div>
         <div className="flex flex-col">
-          <label htmlFor="email" className="font-semibold mb-1 text-lg ">
+          <label htmlFor="email" className="font-semibold mb-1 text-lg">
             Email
           </label>
           <input
             type="text"
             name="email"
-            placeholder={userData?.email}
-            className="bg-transparent ring-0  border-b border-primary outline-none rounded p-1"
+            value={formData.email}
+            onChange={handleChange}
+            className="bg-transparent ring-0 border-b border-primary outline-none rounded p-1"
           />
         </div>
         <div className="flex flex-col">
-          <label htmlFor="firstName" className="font-semibold mb-1 text-lg ">
+          <label htmlFor="bio" className="font-semibold mb-1 text-lg">
             Bio
           </label>
           <input
             type="text"
-            name="firstName"
-            placeholder={userData?.bio}
-            className="bg-transparent ring-0  border-b border-primary outline-none rounded p-1"
+            name="bio"
+            value={formData.bio}
+            onChange={handleChange}
+            className="bg-transparent ring-0 border-b border-primary outline-none rounded p-1"
           />
         </div>
-        <div>
-          <button className="px-3 py-2 w-full bg-accent rounded font-semibold">
-            Güncelle{" "}
+        <div className="">
+          <button
+            type="submit"
+            disabled={isPending}
+            className="px-3 h-[40px] w-full mx-auto bg-accent rounded font-semibold"
+          >
+            {isPending ? <Spinner /> : "Güncelle"}
           </button>
         </div>
       </form>

@@ -1,10 +1,20 @@
 import React from "react";
 
-const Avatar = ({ size }: { size: number }) => {
+const Avatar = ({
+  size,
+  avatarUrl,
+}: {
+  size: number;
+  avatarUrl: string | undefined | null;
+}) => {
   return (
     <img
       className="rounded-full border-primary border-2"
-      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTt47Nkz9791i1h0oVGiXRKnCILIfDkX-wZ_Q&s"
+      src={
+        avatarUrl
+          ? avatarUrl
+          : "https://cdn-icons-png.flaticon.com/512/266/266033.png"
+      }
       style={{ width: size, height: size }}
       alt="Avatar"
     />

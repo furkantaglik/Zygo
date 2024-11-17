@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useLogin, useRegister } from "@/services/authServices";
 import { useAuthStore } from "@/lib/zustand/authStore";
 import { ClipLoader, SyncLoader } from "react-spinners";
-import Spinner from "../spinner";
+import Spinner from "../_global/spinner";
 
 interface LoginFormData {
   email: string;
@@ -22,7 +22,7 @@ const Register = () => {
   });
 
   const router = useRouter();
-  const { trigger, isMutating } = useRegister();
+  const { mutateAsync, isPending } = useRegister();
   const { isAuthenticated, setUser, setToken } = useAuthStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +32,7 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const response = await trigger(formData);
+    const response = await mutateAsync(formData);
     setUser(response.user);
     setToken(response.token);
     router.push("/");
@@ -87,7 +87,7 @@ const Register = () => {
           <button
             type="submit"
             className="p-1 bg-accent rounded font-semibold"
-            disabled={isMutating}
+            disabled={isPending}
           >
             Kayıt Ol
           </button>
