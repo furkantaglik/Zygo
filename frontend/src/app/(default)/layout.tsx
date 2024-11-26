@@ -14,7 +14,7 @@ export default function Layout({
           <Navbar />
         </nav>
 
-        <section className="col-span-12 lg:col-span-10 md:px-0 px-1 lg:pt-5 lg:pl-10  mb-10">
+        <section className="col-span-12 lg:col-span-10 lg:px-0 px-1 lg:pt-5 mb-10 lg:mx-5">
           {children}
         </section>
       </section>

@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useLogin, useRegister } from "@/services/authServices";
+import { useRegister } from "@/services/authServices";
 import { useAuthStore } from "@/lib/zustand/authStore";
-import { ClipLoader, SyncLoader } from "react-spinners";
-import Spinner from "../_global/spinner";
 
 interface LoginFormData {
   email: string;
@@ -23,7 +21,7 @@ const Register = () => {
 
   const router = useRouter();
   const { mutateAsync, isPending } = useRegister();
-  const { isAuthenticated, setUser, setToken } = useAuthStore();
+  const { setUser, setToken } = useAuthStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -33,9 +31,12 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const response = await mutateAsync(formData);
-    setUser(response.user);
-    setToken(response.token);
-    router.push("/");
+    if (response) {
+      const { user, token } = response;
+      setUser(user);
+      setToken(token);
+      router.refresh();
+    }
   };
 
   return (

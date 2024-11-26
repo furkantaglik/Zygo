@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLogin } from "@/services/authServices";
@@ -19,7 +19,7 @@ const Login = () => {
 
   const router = useRouter();
   const { mutateAsync, isPending } = useLogin();
-  const { isAuthenticated, setUser, setToken, token } = useAuthStore();
+  const { setUser, setToken } = useAuthStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -28,14 +28,10 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const { emailOrUsername, password } = formData;
-
     const response = await mutateAsync({ emailOrUsername, password });
-
     if (response) {
       const { user, token } = response;
-
       setUser(user);
       setToken(token);
       router.push("/");

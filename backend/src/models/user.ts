@@ -18,6 +18,10 @@ export interface IUser extends Document {
   stories: mongoose.Types.ObjectId[];
   comments: mongoose.Types.ObjectId[];
   likes: mongoose.Types.ObjectId[];
+  sentRequests: mongoose.Types.ObjectId[];
+  receivedRequests: mongoose.Types.ObjectId[];
+  rejectedRequests: mongoose.Types.ObjectId[];
+  acceptedRequests: mongoose.Types.ObjectId[];
 }
 
 const UserSchema: Schema = new Schema(
@@ -36,12 +40,16 @@ const UserSchema: Schema = new Schema(
       enum: ["admin", "user"],
       default: "user",
     },
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
     stories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Story" }],
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Like" }],
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    sentRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    receivedRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    acceptedRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    rejectedRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );

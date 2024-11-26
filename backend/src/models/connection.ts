@@ -5,7 +5,7 @@ interface IConnection extends Document {
   updatedAt?: Date;
   requester: mongoose.Types.ObjectId;
   receiver: mongoose.Types.ObjectId;
-  status: "pending" | "accepted" | "rejected";
+  status: "pending" | "accepted" | "rejected" | "canceled";
 }
 
 const ConnectionSchema = new Schema<IConnection>(
@@ -22,7 +22,7 @@ const ConnectionSchema = new Schema<IConnection>(
     },
     status: {
       type: String,
-      enum: ["pending", "accepted", "rejected"],
+      enum: ["pending", "accepted", "rejected", "canceled", "blocked"],
       default: "pending",
     },
   },

@@ -6,5 +6,14 @@ export type IConnection = {
   receiver: IUser;
   createdAt: string;
   updatedAt: string;
-  status: "pending" | "accepted" | "rejected";
+  status: "pending" | "accepted" | "rejected" | "blocked";
+};
+
+export type IRequestDetails = {
+  sentRequests: IConnection[];
+  receivedRequests: IConnection[];
+  acceptedRequests: IConnection[];
+  rejectedRequests: IConnection[];
+  acceptedBy: IConnection[];
+  rejectedBy: IConnection[];
 };

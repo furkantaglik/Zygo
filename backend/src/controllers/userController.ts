@@ -1,11 +1,10 @@
 import type { Context } from "hono";
-import { User } from "../models/user.js";
+import { User, type IUser } from "../models/user.js";
 import { sendResponse } from "../lib/utils/sendResponse.js";
 import { Types } from "mongoose";
 
 export const updateUser = async (c: Context) => {
   const file = await c.get("file");
-  const { userId } = c.req.param();
   const { user } = await c.req.parseBody();
 
   let parsedUser;
@@ -14,13 +13,13 @@ export const updateUser = async (c: Context) => {
     parsedUser = JSON.parse(user);
   }
 
-  if (!userId || !Types.ObjectId.isValid(userId)) {
-    return sendResponse(c, 400, "Geçersiz veya eksik kullanıcı ID.");
+  if (!user) {
+    return sendResponse(c, 400, "k.");
   }
 
   if (parsedUser.username) {
     const existingUser = await User.findOne({ username: parsedUser.username });
-    if (existingUser && existingUser._id!.toString() !== userId) {
+    if (existingUser && existingUser._id!.toString() !== parsedUser.id) {
       return sendResponse(c, 400, "Bu kullanıcı adı zaten alınmış.");
     }
   }
@@ -30,7 +29,9 @@ export const updateUser = async (c: Context) => {
   }
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(userId, { ...parsedUser });
+    const updatedUser = await User.findByIdAndUpdate(parsedUser.id, {
+      ...parsedUser,
+    });
     if (!updatedUser) {
       return sendResponse(c, 404, "Kullanıcı bulunamadı.");
     }

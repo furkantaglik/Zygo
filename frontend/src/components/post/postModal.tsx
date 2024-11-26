@@ -35,7 +35,7 @@ const PostModal = ({
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 font-bold text-xl text-white px-2 py-1 rounded-full z-50"
+          className="absolute top-4 right-4 font-bold text-xl text-white px-2 py-1 rounded-full z-50 hover:text-primary"
         >
           <CircleX />
         </button>

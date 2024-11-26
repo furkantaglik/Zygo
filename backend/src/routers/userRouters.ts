@@ -9,7 +9,7 @@ import {
 import { uploadFile } from "../middlewares/uploadFile.js";
 
 const userRouters = new Hono();
-userRouters.post("/update-user/:userId", uploadFile, updateUser);
+userRouters.post("/update-user", uploadFile, updateUser);
 userRouters.get("/get-all-users", getAllUsers);
 userRouters.get("/get-by-userId/:userId", getByUserId);
 userRouters.get("/get-by-username/:username", getByUsername);

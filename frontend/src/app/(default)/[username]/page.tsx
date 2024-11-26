@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GetUserByUsername } from "@/services/userServices";
 import { useAuthStore } from "@/lib/zustand/authStore";
+import PostCard from "@/components/post/postCard";
 
 export default function PostPage() {
   const router = useRouter();
@@ -17,14 +18,14 @@ export default function PostPage() {
   const normalizedPathname = pathname.replace(/^\/+/, "");
   const { data: userData } = GetUserByUsername(normalizedPathname);
   const { user: currentUser } = useAuthStore();
-  const { data, isLoading, error } = GetUserPosts(userData!._id);
+  const { data, isLoading } = GetUserPosts(userData!._id);
   const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   const openModal = (post: IPost) => {
     setSelectedPost(post);
     setIsOpen(true);
-    router.push(`${pathname}?${createQueryString("p", post._id)}`);
+    router.push(`${pathname}?p=${post._id}`);
   };
 
   const closeModal = () => {
@@ -32,18 +33,10 @@ export default function PostPage() {
     setIsOpen(false);
     router.push(pathname);
   };
+
   useEffect(() => {
     closeModal();
   }, [normalizedPathname]);
-
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-      return params.toString();
-    },
-    [searchParams]
-  );
 
   useEffect(() => {
     if (postId && data) {

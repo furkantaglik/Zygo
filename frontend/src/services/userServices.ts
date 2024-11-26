@@ -10,7 +10,7 @@ export const UpdateUser = () => {
     },
     mutationFn: async (formData: FormData) => {
       const { data } = await axiosInstance.post<IUser>(
-        "/user/update-user",
+        `/user/update-user`,
         formData
         // {
         //   headers: { "Content-Type": "multipart/form-data" },
@@ -31,7 +31,7 @@ export const GetAllUsers = () => {
   });
 };
 
-export const GetUserById = (userId: string) => {
+export const GetUserById = (userId: string | undefined) => {
   return useQuery<IUser, Error>({
     queryKey: ["user", userId],
     enabled: !!userId,

@@ -5,9 +5,9 @@ import {
   removeFollower,
   sendRequest,
   unfollow,
-  getRequests,
   getFollowers,
   getFollowing,
+  getConnectionStatuses,
 } from "../controllers/connectionController.js";
 
 const connectionRouters = new Hono();
@@ -18,7 +18,7 @@ connectionRouters.get("/reject-request/:requestId", rejectRequest);
 connectionRouters.get("/unfollow/:userId", unfollow);
 connectionRouters.get("/remove-follower/:userId", removeFollower);
 
-connectionRouters.get("/get-requests", getRequests);
+connectionRouters.get("/get-requests-details", getConnectionStatuses);
 connectionRouters.get("/get-followers/:userId", getFollowers);
 connectionRouters.get("/get-following/:userId", getFollowing);
 

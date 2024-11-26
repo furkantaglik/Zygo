@@ -1,12 +1,5 @@
 "use client";
 import { useAuthStore } from "@/lib/zustand/authStore";
-import { GetUserPosts } from "@/services/postServices";
-import {
-  GetFollowers,
-  GetFollowing,
-  SendRequest,
-  Unfollow,
-} from "@/services/connectionServices";
 import Avatar from "./avatar";
 import {
   LayoutPanelTop,
@@ -15,25 +8,23 @@ import {
   Settings,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { IUser } from "@/types/user";
+import ProfileConnectionCard from "../connection/profileConnectionCard";
 
 const ProfileCard = ({ userData }: { userData: IUser }) => {
   const pathname = usePathname();
-  const { user } = useAuthStore();
-  const { mutate: sendFollowRequest } = SendRequest();
-  const { mutate: unfollowUser } = Unfollow();
-
+  const { user: currentUser } = useAuthStore();
   return (
     <>
-      <section className="grid md:grid-cols-12 grid-cols-1 gap-y-3 border-b border-accent pb-5 max-w-screen-lg mx-auto">
-        <div className="md:col-span-3 mx-auto">
+      <section className="grid lg:grid-cols-12 grid-cols-1 gap-y-3 border-b border-accent pb-5 max-w-screen-lg mx-auto">
+        <div className="lg:col-span-3 mx-auto">
           <Avatar size={150} avatarUrl={userData.avatar} />
         </div>
-        <div className="md:col-span-9 flex flex-col gap-y-5 w-full items-center md:items-start">
+        <div className="lg:col-span-9 flex flex-col gap-y-5 w-full items-center lg:items-start">
           <h1 className="text-xl font-semibold flex items-center gap-x-4">
             {userData.username}
-            {user && user._id === userData._id && (
+            {currentUser && currentUser._id === userData._id && (
               <Link
                 href="/account"
                 className="flex items-center p-1 bg-primary rounded font-bold text-sm gap-x-1"
@@ -42,16 +33,16 @@ const ProfileCard = ({ userData }: { userData: IUser }) => {
               </Link>
             )}
           </h1>
-
+          <ProfileConnectionCard userData={userData} />
           <div>
-            <h3 className="text-center md:text-start">
+            <h3 className="text-center lg:text-start">
               {userData.firstName} {userData.lastName}
             </h3>
             <small className="italic">{userData.bio}</small>
           </div>
         </div>
       </section>
-      <div className="flex mx-auto justify-between md:mx-80">
+      <div className="flex mx-auto justify-between  max-w-lg">
         <Link
           className={`flex items-center gap-x-1 uppercase text-sm font-semibold border-t pt-2 ${
             pathname === `/${userData.username}`
