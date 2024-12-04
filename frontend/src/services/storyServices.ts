@@ -2,7 +2,7 @@ import { IStory } from "@/types/story";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "./axios";
 
-export const GetAllStories = () => {
+export const useGetAllStories = () => {
   return useQuery<IStory[], Error>({
     queryKey: ["stories"],
     queryFn: async () => {
@@ -14,7 +14,7 @@ export const GetAllStories = () => {
   });
 };
 
-export const GetUserStories = (userId: string) => {
+export const useGetuserStories = (userId: string) => {
   return useQuery<IStory[], Error>({
     queryKey: ["userStories", userId],
     enabled: !!userId,
@@ -27,7 +27,7 @@ export const GetUserStories = (userId: string) => {
   });
 };
 
-export const CreateStory = () => {
+export const useCreateStory = () => {
   const queryClient = useQueryClient();
   return useMutation<IStory, Error, IStory>({
     onSuccess: () => {
@@ -43,7 +43,7 @@ export const CreateStory = () => {
   });
 };
 
-export const DeleteStory = () => {
+export const useDeleteStory = () => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, string>({
     onSuccess: () => {

@@ -3,8 +3,7 @@ import axiosInstance from "./axios";
 import { IUser } from "@/types/user";
 import { IRequestDetails } from "@/types/connection";
 
-// İstek gönderme
-export const SendRequest = () => {
+export const useSendRequest = () => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, { receiverId: string }>({
     mutationFn: async ({ receiverId }: { receiverId: string }) => {
@@ -19,8 +18,7 @@ export const SendRequest = () => {
   });
 };
 
-// İstek kabul etme
-export const AcceptRequest = () => {
+export const useAcceptRequest = () => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, { requestId: string }>({
     mutationFn: async ({ requestId }: { requestId: string }) => {
@@ -35,8 +33,7 @@ export const AcceptRequest = () => {
   });
 };
 
-// İstek reddetme
-export const RejectRequest = () => {
+export const useRejectRequest = () => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, { requestId: string }>({
     mutationFn: async ({ requestId }: { requestId: string }) => {
@@ -48,8 +45,7 @@ export const RejectRequest = () => {
   });
 };
 
-// Takipten çıkma
-export const Unfollow = () => {
+export const useUnfollow = () => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, { userId: string }>({
     mutationFn: async ({ userId }: { userId: string }) => {
@@ -62,8 +58,7 @@ export const Unfollow = () => {
   });
 };
 
-// Takipçi kaldırma
-export const RemoveFollower = () => {
+export const useRemoveFollower = () => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, { userId: string }>({
     mutationFn: async ({ userId }: { userId: string }) => {
@@ -76,8 +71,7 @@ export const RemoveFollower = () => {
   });
 };
 
-// İstek detaylarını alma
-export const GetRequestDetails = () => {
+export const useGetRequestDetails = () => {
   return useQuery<IRequestDetails, Error>({
     queryKey: ["requests"],
     queryFn: async () => {
@@ -89,8 +83,7 @@ export const GetRequestDetails = () => {
   });
 };
 
-// Takipçileri alma
-export const GetFollowers = (userId: string) => {
+export const useGetFollowers = (userId: string) => {
   return useQuery<IUser[], Error>({
     queryKey: ["followers", userId],
     enabled: !!userId,
@@ -103,8 +96,7 @@ export const GetFollowers = (userId: string) => {
   });
 };
 
-// Takip edilenleri alma
-export const GetFollowing = (userId: string) => {
+export const useGetFollowing = (userId: string) => {
   return useQuery<IUser[], Error>({
     queryKey: ["following", userId],
     enabled: !!userId,

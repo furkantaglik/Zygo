@@ -1,19 +1,20 @@
 "use client";
 import {
-  GetRequestDetails,
-  AcceptRequest,
-  RejectRequest,
+  useGetRequestDetails,
+  useAcceptRequest,
+  useRejectRequest,
 } from "@/services/connectionServices";
 import { useAuthStore } from "@/lib/zustand/authStore";
 import Spinner from "../_global/spinner";
 import Avatar from "../user/avatar";
 import Link from "next/link";
+import { timeAgo } from "@/lib/utils/timeAgo";
 
 const ConnectionList = () => {
   const { user: currentUser } = useAuthStore();
-  const { data: requests, isLoading: requestsLoading } = GetRequestDetails();
-  const { mutate: acceptRequest } = AcceptRequest();
-  const { mutate: rejectRequest } = RejectRequest();
+  const { data: requests, isLoading: requestsLoading } = useGetRequestDetails();
+  const { mutate: acceptRequest } = useAcceptRequest();
+  const { mutate: rejectRequest } = useRejectRequest();
 
   if (requestsLoading || !currentUser) {
     return <Spinner />;
@@ -39,7 +40,7 @@ const ConnectionList = () => {
       .filter((request) => request.requester.username !== currentUser.username)
       .map((request) => ({
         ...request,
-        status: `sizi takip etmeye başladı. `,
+        status: `sizi takip etmeye başladı.  `,
         relatedUser: request.requester.username,
         avatar: request.requester.avatar,
         requestId: request._id,
@@ -56,45 +57,58 @@ const ConnectionList = () => {
   };
 
   return (
-    <div className="border border-accent p-2">
-      <h1 className="text-xl font-bold mb-4">Bağlantı Yönetimi</h1>
+    <div className="border border-accent p-4 sm:p-6 w-full rounded-lg shadow-lg">
+      <h1 className="text-xl font-semibold  mb-6">Bağlantı Yönetimi</h1>
 
       {filteredRequests.length > 0 ? (
-        <ul className="space-y-2">
+        <ul className="space-y-4">
           {filteredRequests.map((request, index) => (
             <li
               key={index}
-              className="p-2 rounded shadow flex justify-between items-center"
+              className={`p-4 border border-accent grid items-center transition-colors justify-between w-full ${
+                request.action === "receive"
+                  ? "grid-cols-1 gap-3"
+                  : "grid-cols-2"
+              }`}
             >
-              <span className="flex  gap-x-3">
-                <Link href={`/${request.relatedUser}`} className="flex gap-x-1">
-                  <Avatar size={25} avatarUrl={request.avatar} />
-                  <strong> {request.relatedUser}</strong>
+              <div className="flex gap-x-4 items-center">
+                <Link
+                  href={`/${request.relatedUser}`}
+                  className="flex items-center gap-3 hover:text-primary"
+                >
+                  <Avatar size={40} avatarUrl={request.avatar} />
+                  <div>
+                    <strong className="text-lg">{request.relatedUser}</strong>
+                    <p className="text-sm">{request.status}</p>
+                  </div>
                 </Link>
-                <p>{request.status}</p>
-              </span>
+              </div>
 
               {request.action === "receive" && (
-                <div className="space-x-2">
+                <div className="flex gap-x-4 w-full font-semibold text-sm">
                   <button
                     onClick={() => handleAccept(request.requestId)}
-                    className="px-4 py-1 bg-green-500 text-white rounded"
+                    className="px-3 py-2  bg-primary rounded-md hover:bg-primary-dark transition"
                   >
                     Kabul Et
                   </button>
                   <button
                     onClick={() => handleReject(request.requestId)}
-                    className="px-4 py-1 bg-red-500 text-white rounded"
+                    className="px-3 py-2 bg-accent rounded-md hover:bg-accent-dark transition"
                   >
                     Reddet
                   </button>
                 </div>
               )}
+
+              <div className="text-xs ml-auto">
+                {timeAgo(request.updatedAt)}
+              </div>
             </li>
           ))}
         </ul>
       ) : (
-        <p>
+        <p className="text-center text-gray-500 py-6">
           Henüz herhangi bir bağlantı isteği veya takip eden bulunmamaktadır.
         </p>
       )}

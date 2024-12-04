@@ -2,7 +2,7 @@ import { IComment } from "@/types/comment";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "./axios";
 
-export const CreateComment = () => {
+export const useCreateComment = () => {
   const queryClient = useQueryClient();
   return useMutation<IComment, Error, { content: string; postId: string }>({
     onSuccess: () => {
@@ -18,7 +18,7 @@ export const CreateComment = () => {
   });
 };
 
-export const UpdateComment = () => {
+export const useUpdateComment = () => {
   const queryClient = useQueryClient();
   return useMutation<IComment, Error, IComment>({
     onSuccess: () => {
@@ -34,7 +34,7 @@ export const UpdateComment = () => {
   });
 };
 
-export const DeleteComment = () => {
+export const useDeleteComment = () => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, string>({
     onSuccess: () => {
@@ -46,7 +46,7 @@ export const DeleteComment = () => {
   });
 };
 
-export const GetCommentsByPostId = (postId: string) => {
+export const useGetCommentsByPostId = (postId: string) => {
   return useQuery<IComment[], Error>({
     queryKey: ["postComments", postId],
     enabled: !!postId,

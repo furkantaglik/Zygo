@@ -2,37 +2,37 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/lib/zustand/authStore";
 import {
-  SendRequest,
-  Unfollow,
-  RemoveFollower,
-  AcceptRequest,
-  RejectRequest,
+  useSendRequest,
+  useUnfollow,
+  useRemoveFollower,
+  useAcceptRequest,
+  useRejectRequest,
+  useGetRequestDetails,
 } from "@/services/connectionServices";
 import Modal from "../_global/modal";
 import FollowersList from "./followersList";
 import Spinner from "../_global/spinner";
 import { IUser } from "@/types/user";
 import FollowingList from "./followingList";
-import { GetUserPosts } from "@/services/postServices";
+import { useGetUserPosts } from "@/services/postServices";
 
 const ProfileConnectionCard = ({ userData }: { userData: IUser }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  console.log(userData);
-
-  const { data: postData } = GetUserPosts(userData._id);
+  const { data: requests } = useGetRequestDetails();
+  const { data: postData } = useGetUserPosts(userData._id);
   const [isFollowersModalOpen, setFollowersModalOpen] = useState(false);
   const [isFollowingModalOpen, setFollowingModalOpen] = useState(false);
   const { user: currentUser, loading: authLoading } = useAuthStore();
-  const { mutate: unfollowMutate, isPending: isUnfollowing } = Unfollow();
+  const { mutate: unfollowMutate, isPending: isUnfollowing } = useUnfollow();
   const { mutate: removeFollowerMutate, isPending: isRemoving } =
-    RemoveFollower();
+    useRemoveFollower();
   const { mutate: sendRequestMutate, isPending: isSendingRequest } =
-    SendRequest();
+    useSendRequest();
   const { mutate: acceptRequestMutate, isPending: isAccepting } =
-    AcceptRequest();
+    useAcceptRequest();
   const { mutate: rejectRequestMutate, isPending: isRejecting } =
-    RejectRequest();
+    useRejectRequest();
 
   if (authLoading) return <Spinner />;
 
@@ -57,6 +57,11 @@ const ProfileConnectionCard = ({ userData }: { userData: IUser }) => {
     if (tab === "followers") setFollowersModalOpen(true);
     else if (tab === "following") setFollowingModalOpen(true);
   }, [searchParams]);
+
+  const pendingRequest = requests?.receivedRequests.find(
+    (request) =>
+      request.requester._id === userData._id && request.status === "pending"
+  );
 
   const showFollowersModal = () =>
     router.push(`/${userData.username}?tab=followers`);
@@ -119,18 +124,17 @@ const ProfileConnectionCard = ({ userData }: { userData: IUser }) => {
 
             {isHerRequestSent && (
               <div className="flex gap-2 items-center">
-                <p className="text-sm">istek gönderdi</p>
-                <br />
+                <p className="text-sm">İstek gönderdi</p>
                 <button
                   className="bg-primary p-1 px-3 rounded font-semibold text-sm"
-                  onClick={() => handleAcceptRequest("requestId")}
+                  onClick={() => handleAcceptRequest(pendingRequest?._id!)}
                   disabled={isAccepting}
                 >
                   Kabul Et
                 </button>
                 <button
                   className="bg-accent p-1 px-3 rounded font-semibold text-sm"
-                  onClick={() => handleRejectRequest("requestId")}
+                  onClick={() => handleRejectRequest(pendingRequest?._id!)}
                   disabled={isRejecting}
                 >
                   Reddet

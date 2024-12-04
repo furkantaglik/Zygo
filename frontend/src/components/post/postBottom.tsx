@@ -1,11 +1,13 @@
 import { timeAgo } from "@/lib/utils/timeAgo";
-import { CreateComment } from "@/services/commentServices";
-import { CreateLike, DeleteLike } from "@/services/likeServices";
+import { useCreateComment } from "@/services/commentServices";
+import { useCreateLike, useDeleteLike } from "@/services/likeServices";
 import { IComment } from "@/types/comment";
 import { ILike } from "@/types/like";
 import { IPost } from "@/types/post";
 import { Heart, MessageCircle, Pin, Send } from "lucide-react";
 import { useState } from "react";
+import Modal from "../_global/modal";
+import PostLikeList from "../like/postLikeList";
 
 const PostBottom = ({
   post,
@@ -19,9 +21,10 @@ const PostBottom = ({
   comments: IComment[];
 }) => {
   const [newComment, setNewComment] = useState("");
-  const { mutate: createLikeMutate } = CreateLike();
-  const { mutate: deleteLikeMutate } = DeleteLike();
-  const { mutate: CreateCommentMutate } = CreateComment();
+  const [isShowLikeListModal, setShowLikeLİstModal] = useState(false);
+  const { mutate: createLikeMutate } = useCreateLike();
+  const { mutate: deleteLikeMutate } = useDeleteLike();
+  const { mutate: CreateCommentMutate } = useCreateComment();
 
   const likedPost = likes?.find((like) => like.user._id === userId);
   const hasLiked = !!likedPost;
@@ -41,8 +44,12 @@ const PostBottom = ({
     setNewComment("");
   };
 
+  const handleShowLikeList = () => {
+    setShowLikeLİstModal(true);
+  };
+
   return (
-    <div className="border-t border-accent mt-2 flex flex-col">
+    <div className="border-t border-accent flex flex-col py-3">
       <div className="flex justify-between gap-x-2 items-center">
         <div className="flex gap-x-4">
           <button onClick={handleLikeToggle}>
@@ -66,14 +73,25 @@ const PostBottom = ({
         </div>
       </div>
       <div className="flex justify-between">
-        <p className="text-sm font-semibold">
+        <button onClick={handleShowLikeList} className="text-sm font-semibold">
           {likes?.length || 0} Beğeni {comments?.length || 0} Yorum
-        </p>
+        </button>
         <p className="text-sm text-gray-300">{timeAgo(post.createdAt)}</p>
       </div>
+
+      {isShowLikeListModal && (
+        <Modal
+          title="Beğeni Listesi"
+          isOpen={isShowLikeListModal}
+          onClose={() => setShowLikeLİstModal(false)}
+        >
+          <PostLikeList postId={post._id} />
+        </Modal>
+      )}
+
       <form
         onSubmit={handleCommentSubmit}
-        className="mt-2 border-t border-accent relative"
+        className=" border-accent border-b relative "
       >
         <div className="flex items-center">
           <input
@@ -81,7 +99,7 @@ const PostBottom = ({
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Yorum ekle.."
-            className="bg-transparent ring-0 border-0 outline-none w-full p-2 pr-14 border-b border-transparent focus:border-primary"
+            className="bg-transparent ring-0 border-0 outline-none w-full py-2 pr-14 border-b border-transparent focus:border-primary"
           />
           <button
             type="submit"

@@ -220,10 +220,9 @@ export const getFollowers = async (c: Context) => {
     return sendResponse(c, 400, "Geçersiz kullanıcı ID.");
   }
 
-  const user = await User.findById(userId).populate(
-    "followers",
-    "username avatar"
-  );
+  const user = await User.findById(userId)
+    .populate("followers", "username avatar")
+    .sort({ createdAt: -1 });
   if (!user) {
     return sendResponse(c, 404, "Kullanıcı bulunamadı.");
   }
@@ -238,10 +237,9 @@ export const getFollowing = async (c: Context) => {
     return sendResponse(c, 400, "Geçersiz kullanıcı ID.");
   }
 
-  const user = await User.findById(userId).populate(
-    "following",
-    "username avatar"
-  );
+  const user = await User.findById(userId)
+    .populate("following", "username avatar")
+    .sort({ createdAt: -1 });
   if (!user) {
     return sendResponse(c, 404, "Kullanıcı bulunamadı.");
   }
@@ -355,11 +353,13 @@ export const getConnectionStatuses = async (c: Context) => {
   try {
     const sentRequests = await Connection.find({ requester: userId })
       .populate("receiver", "username avatar")
-      .lean();
+      .lean()
+      .sort({ createdAt: -1 });
 
     const receivedRequests = await Connection.find({ receiver: userId })
       .populate("requester", "username avatar")
-      .lean();
+      .lean()
+      .sort({ createdAt: -1 });
 
     const acceptedRequests = await Connection.find({
       $or: [
@@ -368,7 +368,8 @@ export const getConnectionStatuses = async (c: Context) => {
       ],
     })
       .populate("requester receiver", "username avatar")
-      .lean();
+      .lean()
+      .sort({ createdAt: -1 });
 
     const rejectedRequests = await Connection.find({
       $or: [
@@ -377,7 +378,8 @@ export const getConnectionStatuses = async (c: Context) => {
       ],
     })
       .populate("requester receiver", "username avatar")
-      .lean();
+      .lean()
+      .sort({ createdAt: -1 });
 
     const blockedRequests = await Connection.find({
       $or: [
@@ -386,7 +388,8 @@ export const getConnectionStatuses = async (c: Context) => {
       ],
     })
       .populate("requester receiver", "username avatar")
-      .lean();
+      .lean()
+      .sort({ createdAt: -1 });
 
     return sendResponse(c, 200, "Bağlantı durumları", {
       sentRequests,

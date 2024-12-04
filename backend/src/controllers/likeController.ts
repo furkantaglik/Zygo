@@ -42,7 +42,7 @@ export const getPostLikes = async (c: Context) => {
   const { postId } = c.req.param();
 
   const likes = await Like.find({ post: postId })
-    .populate("user", "username")
+    .populate("user", "username avatar")
     .sort({ createdAt: -1 });
 
   return sendResponse(c, 200, "Beğeniler başarıyla getirildi.", likes);

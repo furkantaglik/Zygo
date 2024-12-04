@@ -1,3 +1,4 @@
+"use client";
 import { useSearchParams, useRouter } from "next/navigation";
 import React, { ReactNode } from "react";
 
@@ -20,11 +21,7 @@ const Modal = ({ isOpen, onClose, title, children, footer }: ModalProps) => {
   };
 
   const handleOverlayClick = () => {
-    const newParams = new URLSearchParams(searchParams.toString());
-    newParams.forEach((_, key) => {
-      newParams.delete(key);
-    });
-
+    const newParams = new URLSearchParams();
     router.push(`?${newParams.toString()}`);
     onClose();
   };

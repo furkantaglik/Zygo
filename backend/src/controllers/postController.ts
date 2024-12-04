@@ -31,8 +31,8 @@ export const createPost = async (c: Context) => {
     const newPost = new Post({
       user: user.id,
       content,
-      mediaUrl: file.path,
-      mediaType: file.mediaType,
+      mediaUrl: file?.path,
+      mediaType: file?.mediaType,
     });
 
     await newPost.save();
@@ -87,10 +87,9 @@ export const getUserPosts = async (c: Context) => {
   }
 
   try {
-    const posts = await Post.find({ user: userId }).populate(
-      "user",
-      "username"
-    );
+    const posts = await Post.find({ user: userId })
+      .populate("user", "username")
+      .sort({ createdAt: -1 });
     return sendResponse(
       c,
       200,
@@ -117,7 +116,10 @@ export const getByPostId = async (c: Context) => {
   const { postId } = c.req.param();
 
   try {
-    const post = await Post.findById(postId).populate("user", " username");
+    const post = await Post.findById(postId).populate(
+      "user",
+      " username avatar"
+    );
 
     if (!post) {
       return sendResponse(c, 404, "Gönderi bulunamadı.");

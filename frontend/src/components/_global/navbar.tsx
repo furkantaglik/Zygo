@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/lib/zustand/authStore";
 import Avatar from "../user/avatar";
-import { GetUserById } from "@/services/userServices";
+import { useGetUserById } from "@/services/userServices";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -32,7 +32,7 @@ const Navbar = () => {
       : "";
 
   const { user } = useAuthStore();
-  const { data: userData } = GetUserById(user!._id);
+  const { data: userData } = useGetUserById(user!._id);
 
   return (
     <>

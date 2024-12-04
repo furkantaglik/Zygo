@@ -2,14 +2,14 @@
 import Spinner from "@/components/_global/spinner";
 import Avatar from "@/components/user/avatar";
 import { useAuthStore } from "@/lib/zustand/authStore";
-import { GetUserById, UpdateUser } from "@/services/userServices";
+import { useGetUserById, useUpdateUser } from "@/services/userServices";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 const EditProfile = () => {
   const { user, loading } = useAuthStore();
-  const { data: userData, isLoading } = GetUserById(user!._id);
-  const { mutate, isPending } = UpdateUser();
+  const { data: userData, isLoading } = useGetUserById(user!._id);
+  const { mutate, isPending, isSuccess } = useUpdateUser();
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null | undefined>(
     null
@@ -60,8 +60,10 @@ const EditProfile = () => {
     if (avatarFile) data.append("image", avatarFile);
 
     mutate(data);
-    toast.success("Profil Güncellendi");
   };
+  useEffect(() => {
+    isSuccess && toast.success("Profil Güncellendi");
+  }, [isSuccess]);
 
   if (loading || isLoading) return <Spinner />;
 
@@ -147,9 +149,9 @@ const EditProfile = () => {
           <button
             type="submit"
             disabled={isPending}
-            className="px-3 h-[40px] w-full mx-auto bg-accent rounded font-semibold"
+            className="px-3 h-[40px] w-full mx-auto bg-primary rounded font-semibold"
           >
-            {isPending ? <Spinner /> : "Güncelle"}
+            {isPending ? <Spinner size={10} color="secondary" /> : "Güncelle"}
           </button>
         </div>
       </form>

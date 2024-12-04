@@ -1,7 +1,7 @@
 import { IUser } from "@/types/user";
 import UserCard from "../user/userCard";
 import { IComment } from "@/types/comment";
-import { DeleteComment } from "@/services/commentServices"; // Yorum silme servisi
+import { useDeleteComment } from "@/services/commentServices";
 import { IPost } from "@/types/post";
 import { Delete } from "lucide-react";
 import Link from "next/link";
@@ -16,14 +16,14 @@ const CommentCard = ({
   currentUserId: string;
   post: IPost;
 }) => {
-  const { mutate: deleteCommentTrigger } = DeleteComment();
+  const { mutate: deleteComment } = useDeleteComment();
 
   const handleDeleteComment = async () => {
-    deleteCommentTrigger(comment._id);
+    deleteComment(comment._id);
   };
 
   return (
-    <Link href={user.username} className="border-b border-accent relative">
+    <div className="border-b border-accent relative">
       <UserCard user={comment.user} />
       <p className="block text-sm bg-accent p-2 rounded-md">
         {comment.content}
@@ -37,7 +37,7 @@ const CommentCard = ({
           <Delete />
         </button>
       )}
-    </Link>
+    </div>
   );
 };
 

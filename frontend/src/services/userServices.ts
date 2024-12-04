@@ -2,7 +2,7 @@ import { IUser } from "@/types/user";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "./axios";
 
-export const UpdateUser = () => {
+export const useUpdateUser = () => {
   const queryClient = useQueryClient();
   return useMutation<IUser, Error, FormData>({
     onSuccess: () => {
@@ -12,16 +12,13 @@ export const UpdateUser = () => {
       const { data } = await axiosInstance.post<IUser>(
         `/user/update-user`,
         formData
-        // {
-        //   headers: { "Content-Type": "multipart/form-data" },
-        // }
       );
       return data;
     },
   });
 };
 
-export const GetAllUsers = () => {
+export const useGetAllUsers = () => {
   return useQuery<IUser[], Error>({
     queryKey: ["allUsers"],
     queryFn: async () => {
@@ -31,7 +28,7 @@ export const GetAllUsers = () => {
   });
 };
 
-export const GetUserById = (userId: string | undefined) => {
+export const useGetUserById = (userId: string | undefined) => {
   return useQuery<IUser, Error>({
     queryKey: ["user", userId],
     enabled: !!userId,
@@ -44,7 +41,7 @@ export const GetUserById = (userId: string | undefined) => {
   });
 };
 
-export const GetUserByUsername = (username: string) => {
+export const useGetUserByUsername = (username: string) => {
   return useQuery<IUser, Error>({
     queryKey: ["userByUsername", username],
     enabled: !!username,
@@ -57,7 +54,7 @@ export const GetUserByUsername = (username: string) => {
   });
 };
 
-export const GetUserByEmail = (email: string) => {
+export const useGetUserByEmail = (email: string) => {
   return useQuery<IUser, Error>({
     queryKey: ["userByEmail", email],
     enabled: !!email,

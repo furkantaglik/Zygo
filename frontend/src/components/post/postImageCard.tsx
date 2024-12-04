@@ -2,22 +2,13 @@ import { IPost } from "@/types/post";
 import { Play, Image } from "lucide-react";
 import React from "react";
 
-const PostImageCard = ({
-  post,
-  onClick,
-}: {
-  post: IPost;
-  onClick: () => void;
-}) => {
+const PostImageCard = ({ post }: { post: IPost }) => {
   const mediaUrl =
     post.mediaType === "video"
       ? `${post.mediaUrl!.replace(/\.mp4$/, ".jpg")}`
       : post.mediaUrl;
   return (
-    <div
-      className="relative w-full md:h-[300px] h-[200px] bg-slate-100 cursor-pointer"
-      onClick={onClick}
-    >
+    <div className="relative w-full md:h-[300px] h-[200px] cursor-pointer border border-accent rounded p-1">
       <img
         className="w-full h-full object-cover"
         src={mediaUrl}

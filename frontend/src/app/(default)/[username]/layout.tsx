@@ -2,12 +2,12 @@
 import ProfileCard from "@/components/user/profileCard";
 import Spinner from "@/components/_global/spinner";
 import React, { ReactNode, useEffect, useState } from "react";
-import { GetUserByUsername } from "@/services/userServices";
+import { useGetUserByUsername } from "@/services/userServices";
 import { useParams } from "next/navigation";
 
 const Layout = ({ children }: { children: ReactNode }) => {
   const [username, setUsername] = useState<string | null>(null);
-  const { data: userData, isLoading } = GetUserByUsername(username!);
+  const { data: userData, isLoading } = useGetUserByUsername(username!);
   const params = useParams<{ username: string }>();
 
   useEffect(() => {

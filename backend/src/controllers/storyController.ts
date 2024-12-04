@@ -49,7 +49,9 @@ export const deleteStory = async (c: Context) => {
 export const getAllStories = async (c: Context) => {
   const stories = await Story.find({
     expiresAt: { $gte: new Date() },
-  }).populate("user", "username");
+  })
+    .populate("user", "username")
+    .sort({ createdAt: -1 });
 
   return sendResponse(
     c,
@@ -69,7 +71,9 @@ export const getUserStories = async (c: Context) => {
   const stories = await Story.find({
     user: userId,
     expiresAt: { $gte: new Date() },
-  }).populate("user", "username");
+  })
+    .populate("user", "username")
+    .sort({ createdAt: -1 });
 
   return sendResponse(
     c,

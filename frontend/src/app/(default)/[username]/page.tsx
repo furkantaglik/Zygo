@@ -1,14 +1,13 @@
 "use client";
 import PostImageCard from "@/components/post/postImageCard";
-import PostModal from "@/components/post/postModal";
 import Spinner from "@/components/_global/spinner";
-import { GetUserPosts } from "@/services/postServices";
+import { useGetUserPosts } from "@/services/postServices";
 import { IPost } from "@/types/post";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { GetUserByUsername } from "@/services/userServices";
+import { useGetUserByUsername } from "@/services/userServices";
 import { useAuthStore } from "@/lib/zustand/authStore";
-import PostCard from "@/components/post/postCard";
+import Link from "next/link";
 
 export default function PostPage() {
   const router = useRouter();
@@ -16,9 +15,9 @@ export default function PostPage() {
   const searchParams = useSearchParams();
   const postId = searchParams.get("p");
   const normalizedPathname = pathname.replace(/^\/+/, "");
-  const { data: userData } = GetUserByUsername(normalizedPathname);
+  const { data: userData } = useGetUserByUsername(normalizedPathname);
   const { user: currentUser } = useAuthStore();
-  const { data, isLoading } = GetUserPosts(userData!._id);
+  const { data, isLoading } = useGetUserPosts(userData!._id);
   const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -56,22 +55,22 @@ export default function PostPage() {
     <>
       <section className="grid grid-cols-3 gap-2">
         {data?.map((post) => (
-          <PostImageCard
-            key={post._id}
-            post={post}
-            onClick={() => openModal(post)}
-          />
+          <Link key={post._id} href={`/post/${post._id}`}>
+            <PostImageCard post={post} />
+          </Link>
         ))}
       </section>
 
-      {isOpen && selectedPost && (
+      {/* Modal için */}
+
+      {/* {isOpen && selectedPost && (
         <PostModal
           post={selectedPost}
           currentUser={currentUser!}
           user={userData!}
           onClose={closeModal}
         />
-      )}
+      )} */}
     </>
   );
 }

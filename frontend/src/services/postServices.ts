@@ -2,7 +2,7 @@ import { IPost } from "@/types/post";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "./axios";
 
-export const GetAllPosts = () => {
+export const useGetAllPosts = () => {
   return useQuery<IPost[], Error>({
     queryKey: ["posts"],
     queryFn: async () => {
@@ -12,7 +12,7 @@ export const GetAllPosts = () => {
   });
 };
 
-export const GetUserPosts = (userId: string) => {
+export const useGetUserPosts = (userId: string) => {
   return useQuery<IPost[], Error>({
     queryKey: ["userPosts", userId],
     enabled: !!userId,
@@ -25,7 +25,7 @@ export const GetUserPosts = (userId: string) => {
   });
 };
 
-export const GetPostById = (postId: string) => {
+export const useGetPostById = (postId: string) => {
   return useQuery<IPost, Error>({
     queryKey: ["post", postId],
     enabled: !!postId,
@@ -38,23 +38,24 @@ export const GetPostById = (postId: string) => {
   });
 };
 
-export const CreatePost = () => {
+export const useCreatePost = () => {
   const queryClient = useQueryClient();
-  return useMutation<IPost, Error, IPost>({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["userPosts"] });
-    },
-    mutationFn: async (newPost: IPost) => {
+
+  return useMutation<IPost, Error, FormData>({
+    mutationFn: async (formData: FormData) => {
       const { data } = await axiosInstance.post<IPost>(
         "/post/create-post",
-        newPost
+        formData
       );
       return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userPosts"] });
     },
   });
 };
 
-export const UpdatePost = () => {
+export const useUpdatePost = () => {
   const queryClient = useQueryClient();
   return useMutation<IPost, Error, IPost>({
     onSuccess: () => {
@@ -70,7 +71,7 @@ export const UpdatePost = () => {
   });
 };
 
-export const DeletePost = () => {
+export const useDeletePost = () => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, string>({
     onSuccess: () => {
