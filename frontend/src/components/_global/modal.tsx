@@ -22,7 +22,7 @@ const Modal = ({ isOpen, onClose, title, children, footer }: ModalProps) => {
 
   const handleOverlayClick = () => {
     const newParams = new URLSearchParams();
-    router.push(`?${newParams.toString()}`);
+    router.replace(`?${newParams.toString()}`);
     onClose();
   };
 

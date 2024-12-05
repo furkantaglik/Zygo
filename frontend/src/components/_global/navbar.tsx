@@ -13,6 +13,7 @@ import {
 import { useAuthStore } from "@/lib/zustand/authStore";
 import Avatar from "../user/avatar";
 import { useGetUserById } from "@/services/userServices";
+import Logo from "./logo";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -38,11 +39,7 @@ const Navbar = () => {
     <>
       {/* Desktop Navbar */}
       <div className="hidden lg:flex flex-col h-screen w-full border-r border-accent pt-5 sticky top-0">
-        <Link href="/">
-          <h4 className="ml-4 text-3xl font-semibold italic text-primary">
-            Zygo
-          </h4>
-        </Link>
+        <Logo />
         <ul className="mt-5 flex flex-col gap-y-5 text-lg">
           {menuItems.slice(0, -1).map(({ href, label, icon }) => (
             <Link

@@ -1,30 +1,44 @@
-import { timeAgo } from "@/lib/utils/timeAgo";
-import { useCreateComment } from "@/services/commentServices";
-import { useCreateLike, useDeleteLike } from "@/services/likeServices";
-import { IComment } from "@/types/comment";
-import { ILike } from "@/types/like";
-import { IPost } from "@/types/post";
+"use client";
 import { Heart, MessageCircle, Pin, Send } from "lucide-react";
 import { useState } from "react";
 import Modal from "../_global/modal";
 import PostLikeList from "../like/postLikeList";
+import { IPost } from "@/types/post";
+import { IComment } from "@/types/comment";
+import { ILike } from "@/types/like";
+import { timeAgo } from "@/lib/utils/timeAgo";
+import { useCreateComment } from "@/services/commentServices";
+import { useCreateLike, useDeleteLike } from "@/services/likeServices";
+import { useRef, useEffect } from "react";
 
 const PostBottom = ({
   post,
   likes,
   userId,
   comments,
+  handleShowComments,
+  showComments,
 }: {
   post: IPost;
   likes: ILike[];
   userId: string;
   comments: IComment[];
+  handleShowComments: () => void;
+  showComments: boolean;
 }) => {
   const [newComment, setNewComment] = useState("");
   const [isShowLikeListModal, setShowLikeLİstModal] = useState(false);
   const { mutate: createLikeMutate } = useCreateLike();
   const { mutate: deleteLikeMutate } = useDeleteLike();
   const { mutate: CreateCommentMutate } = useCreateComment();
+
+  const commentInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (showComments && commentInputRef.current) {
+      commentInputRef.current.focus();
+    }
+  }, [showComments]);
 
   const likedPost = likes?.find((like) => like.user._id === userId);
   const hasLiked = !!likedPost;
@@ -37,6 +51,7 @@ const PostBottom = ({
       createLikeMutate({ postId: post._id });
     }
   };
+
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -59,8 +74,12 @@ const PostBottom = ({
               color={hasLiked ? "red" : "currentColor"}
             />
           </button>
-          <button>
-            <MessageCircle size={25} />
+          <button onClick={handleShowComments}>
+            <MessageCircle
+              size={25}
+              fill={showComments ? "white" : "none"}
+              color={showComments ? "white" : "currentColor"}
+            />
           </button>
           <button>
             <Send size={25} />
@@ -73,10 +92,21 @@ const PostBottom = ({
         </div>
       </div>
       <div className="flex justify-between">
-        <button onClick={handleShowLikeList} className="text-sm font-semibold">
-          {likes?.length || 0} Beğeni {comments?.length || 0} Yorum
-        </button>
-        <p className="text-sm text-gray-300">{timeAgo(post.createdAt)}</p>
+        <div className="flex gap-x-1">
+          <button
+            onClick={handleShowLikeList}
+            className="text-sm font-semibold"
+          >
+            {likes?.length || 0} Beğeni
+          </button>
+          <button
+            onClick={handleShowComments}
+            className="text-sm font-semibold"
+          >
+            {comments?.length || 0} Yorum
+          </button>
+        </div>
+        <p className="text-xs  text-gray-300">{timeAgo(post.createdAt)}</p>
       </div>
 
       {isShowLikeListModal && (
@@ -89,26 +119,29 @@ const PostBottom = ({
         </Modal>
       )}
 
-      <form
-        onSubmit={handleCommentSubmit}
-        className=" border-accent border-b relative "
-      >
-        <div className="flex items-center">
-          <input
-            type="text"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Yorum ekle.."
-            className="bg-transparent ring-0 border-0 outline-none w-full py-2 pr-14 border-b border-transparent focus:border-primary"
-          />
-          <button
-            type="submit"
-            className="text-xs text-primary absolute right-2 bottom-2"
-          >
-            Paylaş
-          </button>
-        </div>
-      </form>
+      {showComments && (
+        <form
+          onSubmit={handleCommentSubmit}
+          className="border-accent border-t relative pt-3"
+        >
+          <div className="flex items-center">
+            <input
+              ref={commentInputRef}
+              type="text"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Yorum ekle.."
+              className="bg-transparent ring-0 border-0 outline-none w-full py-2 pr-14 border-b border-transparent focus:border-primary"
+            />
+            <button
+              type="submit"
+              className="text-xs text-primary absolute right-2 bottom-2"
+            >
+              Paylaş
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 };

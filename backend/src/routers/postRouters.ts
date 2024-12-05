@@ -4,6 +4,7 @@ import {
   deletePost,
   getAllPosts,
   getByPostId,
+  getFollowingPosts,
   getUserPosts,
   updatePost,
 } from "../controllers/postController.js";
@@ -17,5 +18,6 @@ postRouters.get("/delete-post/:postId", deletePost);
 postRouters.get("/get-user-posts/:userId", getUserPosts);
 postRouters.get("/get-all-posts", getAllPosts);
 postRouters.get("/get-by-postId/:postId", getByPostId);
+postRouters.get("/get-following-posts", getFollowingPosts);
 
 export default postRouters;

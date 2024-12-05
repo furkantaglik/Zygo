@@ -12,6 +12,18 @@ export const useGetAllPosts = () => {
   });
 };
 
+export const useGetFollowingPosts = () => {
+  return useQuery<IPost[], Error>({
+    queryKey: ["posts"],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get<IPost[]>(
+        "/post/get-following-posts"
+      );
+      return data;
+    },
+  });
+};
+
 export const useGetUserPosts = (userId: string) => {
   return useQuery<IPost[], Error>({
     queryKey: ["userPosts", userId],

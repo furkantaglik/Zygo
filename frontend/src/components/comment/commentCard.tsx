@@ -24,15 +24,19 @@ const CommentCard = ({
 
   return (
     <div className="border-b border-accent relative">
-      <UserCard user={comment.user} />
-      <p className="block text-sm bg-accent p-2 rounded-md">
-        {comment.content}
-      </p>
+      <div className="">
+        <div className=" col-span-2">
+          <UserCard user={comment.user} />
+        </div>
+        <p className="block text-sm bg-accent p-2 rounded-md w-full break-words col-span-9">
+          {comment.content}
+        </p>
+      </div>
       {currentUserId === comment.user._id && (
         <button
           type="button"
           onClick={handleDeleteComment}
-          className="text-xs text-primary absolute right-2 top-2"
+          className="text-xs text-primary absolute right-2 top-0"
         >
           <Delete />
         </button>
