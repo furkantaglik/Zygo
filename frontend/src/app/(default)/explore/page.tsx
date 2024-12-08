@@ -1,26 +1,45 @@
 "use client";
-import PostCard from "@/components/post/postCard";
+import Spinner from "@/components/_global/spinner";
+import PostImageCard from "@/components/post/postImageCard";
+import SearchUser from "@/components/user/searchUser";
 import { useGetAllPosts } from "@/services/postServices";
-import React from "react";
+import { Search } from "lucide-react";
+import Link from "next/link";
+import React, { useState } from "react";
 
 const ExplorePage = () => {
-  const { data: posts, isLoading, isError } = useGetAllPosts();
+  const { data: posts, isLoading } = useGetAllPosts();
+  const [showSearchModal, setShowSearchModal] = useState(false);
 
-  if (isError || !posts || posts.length === 0) {
-    return (
-      <p className="text-center font-semibold italic mt-10">
-        kullanıcıların henüz bir gönderisi yok.
-      </p>
-    );
+  if (isLoading) {
+    return <Spinner />;
   }
+
+  if (!posts || posts.length === 0) {
+    return <p>Henüz bir gönderi yayınlanmadı</p>;
+  }
+
   return (
-    <section>
-      <div className="flex flex-col items-center gap-y-10">
-        {posts.map((post) => (
-          <PostCard key={post._id} post={post} />
-        ))}
+    <>
+      <div className="flex justify-center items-center mb-5">
+        <button
+          onClick={() => setShowSearchModal(true)}
+          className="border border-accent py-2 px-10 rounded-2xl bg-accent flex gap-x-2 text-sm items-center font-semibold"
+        >
+          <Search /> Kullanıcı Ara
+        </button>
+        {showSearchModal && (
+          <SearchUser onClose={() => setShowSearchModal(false)} />
+        )}
       </div>
-    </section>
+      <section className="grid grid-cols-3 gap-2">
+        {posts.map((post) => (
+          <Link key={post._id} href={`/post/${post._id}`}>
+            <PostImageCard post={post} />
+          </Link>
+        ))}
+      </section>
+    </>
   );
 };
 

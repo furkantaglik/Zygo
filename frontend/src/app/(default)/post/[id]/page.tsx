@@ -1,80 +1,46 @@
 "use client";
-import { useState, useEffect } from "react";
-import NotFound from "@/components/_global/notFound";
+import React, { useEffect, useRef } from "react";
+import { useParams } from "next/navigation";
 import Spinner from "@/components/_global/spinner";
 import PostCard from "@/components/post/postCard";
-import { useGetPostById, useGetUserPosts } from "@/services/postServices";
-import { useParams, useRouter } from "next/navigation";
-import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
+import { useGetUserPosts } from "@/services/postServices";
+import { useAuthStore } from "@/lib/zustand/authStore";
 
 const PostDetailPage = () => {
+  const { user: currentUser, loading } = useAuthStore();
   const params = useParams<{ id: string }>();
-  const {
-    data: post,
-    isLoading: isPostLoading,
-    isError,
-  } = useGetPostById(params.id);
-  const { data: userPosts, isLoading: isUserPostsLoading } = useGetUserPosts(
-    post?.user._id || ""
-  );
-  const router = useRouter();
-  const [currentPostIndex, setCurrentPostIndex] = useState<number | null>(null);
+  const { data: userPosts, isLoading } = useGetUserPosts(currentUser!._id);
+  const postRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    if (userPosts && params?.id) {
-      const index = userPosts.findIndex((p) => p._id === params.id);
-      setCurrentPostIndex(index);
+    if (params.id && userPosts) {
+      const index = userPosts.findIndex((post) => post._id === params.id);
+      if (index !== -1 && postRefs.current[index]) {
+        postRefs.current[index]?.scrollIntoView({
+          block: "center",
+        });
+      }
     }
-  }, [userPosts, params?.id]);
+  }, [params.id, userPosts]);
 
-  const handleNext = () => {
-    if (
-      userPosts &&
-      currentPostIndex !== null &&
-      currentPostIndex < userPosts.length - 1
-    ) {
-      const nextPost = userPosts[currentPostIndex + 1];
-      router.push(`/post/${nextPost._id}`);
-    }
-  };
-
-  const handlePrev = () => {
-    if (userPosts && currentPostIndex !== null && currentPostIndex > 0) {
-      const prevPost = userPosts[currentPostIndex - 1];
-      router.push(`/post/${prevPost._id}`);
-    }
-  };
-
-  if (!params || isPostLoading || isUserPostsLoading) {
+  if (isLoading || loading) {
     return <Spinner />;
-  }
-  if (isError || !userPosts || currentPostIndex === null) {
-    return <NotFound />;
   }
 
   return (
-    <section className="relative flex items-center justify-center  ">
-      {currentPostIndex !== 0 && (
-        <button
-          className="absolute left-0 transform -translate-y-1/2 top-1/2 p-4 hover:text-primary"
-          onClick={handlePrev}
-        >
-          <ArrowBigLeft size={32} />
-        </button>
-      )}
-
-      <div className="flex justify-center items-center">
-        <PostCard post={post!} />
+    <section>
+      <div className="flex flex-col items-center gap-y-10">
+        {userPosts?.map((post, index) => (
+          <div
+            key={post._id}
+            ref={(el) => {
+              postRefs.current[index] = el;
+            }}
+          >
+            <PostCard post={post} />
+          </div>
+        ))}
       </div>
-
-      {currentPostIndex !== userPosts.length - 1 && (
-        <button
-          className="absolute right-0 transform -translate-y-1/2 top-1/2 p-4 hover:text-primary"
-          onClick={handleNext}
-        >
-          <ArrowBigRight size={32} />
-        </button>
-      )}
     </section>
   );
 };

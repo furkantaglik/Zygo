@@ -6,6 +6,7 @@ import {
   Pin,
   GalleryHorizontalEnd,
   Settings,
+  Image,
   LogOut,
 } from "lucide-react";
 import Link from "next/link";
@@ -14,24 +15,22 @@ import { IUser } from "@/types/user";
 import Modal from "../_global/modal";
 import NewPost from "../post/newPost";
 import { useEffect, useState } from "react";
-import { Image } from "lucide-react";
 import ProfileConnectionCard from "../connection/profileConnectionCard";
+import NewStory from "../story/newStory";
+import { useGetuserStories } from "@/services/storyServices";
+import StoryCarousel from "../story/storyCarrousel";
 
 const ProfileCard = ({ userData }: { userData: IUser }) => {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user: currentUser, logout } = useAuthStore();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPosTModalOpen, setIsPostModalOpen] = useState(false);
+  const [isStoryModalOpen, setIsStoryModalOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+  const [userStoriesModal, setUserStoriesModal] = useState(false);
 
-  const handleOpen = () => {
-    router.push("?tab=newPost");
-  };
-
-  const handleClose = () => {
-    setIsModalOpen(false);
-  };
+  const { data: userStories, isLoading } = useGetuserStories(userData._id);
 
   const handleLogoutClick = () => {
     setLogoutModalOpen(true);
@@ -47,17 +46,30 @@ const ProfileCard = ({ userData }: { userData: IUser }) => {
     setLogoutModalOpen(false);
   };
 
-  useEffect(() => {
-    const tab = searchParams.get("tab");
-    setIsModalOpen(tab === "newPost");
-  }, [searchParams]);
-
   return (
     <>
       <section className="grid lg:grid-cols-12 grid-cols-1 gap-y-3 border-b border-accent pb-5 max-w-screen-lg mx-auto">
-        <div className="lg:col-span-3 mx-auto">
+        <div
+          className="lg:col-span-3 mx-auto cursor-pointer"
+          onClick={() => setUserStoriesModal(true)}
+        >
           <Avatar size={150} avatarUrl={userData.avatar} />
         </div>
+
+        <Modal
+          isOpen={userStoriesModal}
+          onClose={() => setUserStoriesModal(false)}
+          title={`${userData.username}`}
+        >
+          {isLoading ? (
+            <p>Hikayeler yükleniyor...</p>
+          ) : userStories && userStories.length > 0 ? (
+            <StoryCarousel stories={userStories} />
+          ) : (
+            <p>Henüz hikaye paylaşılmamış.</p>
+          )}
+        </Modal>
+
         <div className="lg:col-span-9 flex flex-col gap-y-5 w-full items-center lg:items-start">
           <div className="text-xl font-semibold flex items-center gap-x-4 md:w-full ">
             <h1>{userData.username}</h1>
@@ -88,19 +100,32 @@ const ProfileCard = ({ userData }: { userData: IUser }) => {
           {/* New Post */}
           {currentUser?._id === userData._id && (
             <section>
-              <div className="flex">
+              <div className="flex gap-x-3">
                 <button
-                  onClick={handleOpen}
+                  onClick={() => setIsPostModalOpen(true)}
                   className="border border-accent font-semibold rounded flex p-1 gap-x-1"
                 >
                   <Image /> +
                 </button>
+                <button
+                  onClick={() => setIsStoryModalOpen(true)}
+                  className="border border-accent font-semibold rounded flex p-1 gap-x-1"
+                >
+                  <GalleryHorizontalEnd /> +
+                </button>
                 <Modal
-                  isOpen={isModalOpen}
-                  onClose={handleClose}
+                  isOpen={isPosTModalOpen}
+                  onClose={() => setIsPostModalOpen(false)}
                   title="Yeni Gönderi"
                 >
                   <NewPost />
+                </Modal>
+                <Modal
+                  isOpen={isStoryModalOpen}
+                  onClose={() => setIsStoryModalOpen(false)}
+                  title="Yeni Hikaye"
+                >
+                  <NewStory />
                 </Modal>
               </div>
             </section>
@@ -108,7 +133,7 @@ const ProfileCard = ({ userData }: { userData: IUser }) => {
         </div>
       </section>
 
-      <div className="flex mx-auto justify-between max-w-lg">
+      <div className="flex mx-auto justify-center gap-x-10 max-w-lg">
         <Link
           className={`flex items-center gap-x-1 uppercase text-sm font-semibold border-t pt-2 ${
             pathname === `/${userData.username}`
@@ -129,7 +154,7 @@ const ProfileCard = ({ userData }: { userData: IUser }) => {
         >
           <Pin size={15} /> Kaydedilenler
         </Link>
-        <Link
+        {/* <Link
           className={`flex items-center gap-x-1 uppercase text-sm font-semibold border-t pt-2 ${
             pathname === `/${userData.username}/stories`
               ? "text-primary border-primary"
@@ -138,7 +163,7 @@ const ProfileCard = ({ userData }: { userData: IUser }) => {
           href={`/${userData.username}/stories`}
         >
           <GalleryHorizontalEnd size={15} /> Hikayeler
-        </Link>
+        </Link> */}
       </div>
 
       {/* Logout Modal */}

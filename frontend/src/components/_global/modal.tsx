@@ -32,7 +32,7 @@ const Modal = ({ isOpen, onClose, title, children, footer }: ModalProps) => {
       onClick={handleOverlayClick}
     >
       <div
-        className="bg-background rounded-lg shadow-lg w-full max-w-lg mx-4 border border-accent absolute bottom-16 md:bottom-auto"
+        className="bg-background rounded-lg shadow-lg w-full max-w-lg mx-4 border border-accent absolute bottom-14 md:bottom-auto"
         onClick={handleModalClick}
       >
         {title && (

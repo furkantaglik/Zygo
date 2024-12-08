@@ -1,6 +1,6 @@
 "use client";
 import { Heart, MessageCircle, Pin, Send } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Modal from "../_global/modal";
 import PostLikeList from "../like/postLikeList";
 import { IPost } from "@/types/post";
@@ -8,19 +8,25 @@ import { IComment } from "@/types/comment";
 import { ILike } from "@/types/like";
 import { timeAgo } from "@/lib/utils/timeAgo";
 import { useCreateComment } from "@/services/commentServices";
-import { useCreateLike, useDeleteLike } from "@/services/likeServices";
-import { useRef, useEffect } from "react";
+import {
+  useCreateLike,
+  useDeleteLike,
+  useGetPostLikes,
+} from "@/services/likeServices";
+import {
+  useGetUserSaves,
+  useCreateSave,
+  useDeleteSave,
+} from "@/services/saveServices";
 
 const PostBottom = ({
   post,
-  likes,
   userId,
   comments,
   handleShowComments,
   showComments,
 }: {
   post: IPost;
-  likes: ILike[];
   userId: string;
   comments: IComment[];
   handleShowComments: () => void;
@@ -30,7 +36,11 @@ const PostBottom = ({
   const [isShowLikeListModal, setShowLikeLİstModal] = useState(false);
   const { mutate: createLikeMutate } = useCreateLike();
   const { mutate: deleteLikeMutate } = useDeleteLike();
-  const { mutate: CreateCommentMutate } = useCreateComment();
+  const { mutate: createCommentMutate } = useCreateComment();
+  const { data: likes } = useGetPostLikes(post._id);
+  const { data: savedPosts } = useGetUserSaves();
+  const { mutate: createSaveMutate } = useCreateSave();
+  const { mutate: deleteSaveMutate } = useDeleteSave();
 
   const commentInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -43,19 +53,27 @@ const PostBottom = ({
   const likedPost = likes?.find((like) => like.user._id === userId);
   const hasLiked = !!likedPost;
   const likeId = likedPost?._id;
+  const hasSaved = savedPosts?.find((save) => save.post._id === post._id);
 
-  const handleLikeToggle = async () => {
+  const handleLikeToggle = () => {
     if (hasLiked && likeId) {
       deleteLikeMutate(likeId);
     } else {
       createLikeMutate({ postId: post._id });
     }
   };
+  const handlePinClick = () => {
+    if (hasSaved) {
+      deleteSaveMutate(post._id);
+    } else {
+      createSaveMutate(post._id);
+    }
+  };
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) return;
-    CreateCommentMutate({ content: newComment, postId: post._id });
+    createCommentMutate({ content: newComment, postId: post._id });
     setNewComment("");
   };
 
@@ -69,6 +87,7 @@ const PostBottom = ({
         <div className="flex gap-x-4">
           <button onClick={handleLikeToggle}>
             <Heart
+              className="hover:fill-red-600 hover:text-red-600"
               size={25}
               fill={hasLiked ? "red" : "none"}
               color={hasLiked ? "red" : "currentColor"}
@@ -86,8 +105,12 @@ const PostBottom = ({
           </button>
         </div>
         <div>
-          <button>
-            <Pin size={25} />
+          <button onClick={handlePinClick}>
+            <Pin
+              size={25}
+              fill={hasSaved ? "white" : "none"}
+              color={hasSaved ? "white" : "currentColor"}
+            />
           </button>
         </div>
       </div>
@@ -106,7 +129,7 @@ const PostBottom = ({
             {comments?.length || 0} Yorum
           </button>
         </div>
-        <p className="text-xs  text-gray-300">{timeAgo(post.createdAt)}</p>
+        <p className="text-xs text-gray-300">{timeAgo(post.createdAt)}</p>
       </div>
 
       {isShowLikeListModal && (

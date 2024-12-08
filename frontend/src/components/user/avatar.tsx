@@ -1,3 +1,4 @@
+import { IUser } from "@/types/user";
 import React from "react";
 
 const Avatar = ({

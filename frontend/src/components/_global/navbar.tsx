@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -14,17 +14,17 @@ import { useAuthStore } from "@/lib/zustand/authStore";
 import Avatar from "../user/avatar";
 import { useGetUserById } from "@/services/userServices";
 import Logo from "./logo";
+import SearchUser from "@/components/user/searchUser";
 
 const Navbar = () => {
   const pathname = usePathname();
+  const [showSearchModal, setShowSearchModal] = useState(false);
 
   const menuItems = [
     { href: "/", label: "Ana Sayfa", icon: <House /> },
-    { href: "/search", label: "Ara", icon: <Search /> },
     { href: "/explore", label: "Keşfet", icon: <Compass /> },
     { href: "/messages", label: "Mesajlar", icon: <MessageCircle /> },
     { href: "/notifications", label: "Bildirimler", icon: <Bell /> },
-    { href: "/profile", label: "Profil", icon: <User /> },
   ];
 
   const isActive = (path: string) =>
@@ -41,7 +41,7 @@ const Navbar = () => {
       <div className="hidden lg:flex flex-col h-screen w-full border-r border-accent pt-5 sticky top-0">
         <Logo />
         <ul className="mt-5 flex flex-col gap-y-5 text-lg">
-          {menuItems.slice(0, -1).map(({ href, label, icon }) => (
+          {menuItems.map(({ href, label, icon }) => (
             <Link
               href={href}
               key={href}
@@ -53,6 +53,13 @@ const Navbar = () => {
               {label}
             </Link>
           ))}
+          <li
+            onClick={() => setShowSearchModal(true)}
+            className="p-2 hover:bg-accent mx-2 rounded cursor-pointer transition-all flex items-center gap-x-2"
+          >
+            <Search />
+            Ara
+          </li>
         </ul>
         <Link
           href={`/${userData?.username}`}
@@ -61,14 +68,14 @@ const Navbar = () => {
           )}`}
         >
           <Avatar size={30} avatarUrl={userData?.avatar} />
-          Profile
+          Profil
         </Link>
       </div>
 
       {/* Mobile Navbar */}
       <div className="lg:hidden fixed bottom-0 left-0 w-full p-4 border-t border-accent bg-background z-30">
-        <ul className="flex justify-around">
-          {menuItems.slice(0, -1).map(({ href, label, icon }) => (
+        <ul className="flex justify-around items-center ">
+          {menuItems.map(({ href, label, icon }) => (
             <Link
               href={href}
               key={href}
@@ -77,14 +84,26 @@ const Navbar = () => {
               {icon}
             </Link>
           ))}
-          <Link
-            href={`/${userData?.username}`}
-            className={`hover:scale-110 transition-all`}
+
+          <li
+            onClick={() => setShowSearchModal(true)}
+            className="hover:scale-110 transition-all"
           >
-            <Avatar size={30} avatarUrl={userData?.avatar} />
+            <Search />
+          </li>
+          <Link
+            href={`/${user?.username}`}
+            className={`hover:scale-110 transition-all `}
+          >
+            <Avatar size={25} avatarUrl={user?.avatar} />
           </Link>
         </ul>
       </div>
+
+      {/* Search Modal */}
+      {showSearchModal && (
+        <SearchUser onClose={() => setShowSearchModal(false)} />
+      )}
     </>
   );
 };

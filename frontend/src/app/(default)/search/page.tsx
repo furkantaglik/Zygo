@@ -1,8 +1,10 @@
+"use client";
 import SearchUser from "@/components/user/searchUser";
-import React from "react";
+import { useState } from "react";
 
 const SearchPage = () => {
-  return <SearchUser />;
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  return <SearchUser onClose={() => setShowSearchModal(false)} />;
 };
 
 export default SearchPage;

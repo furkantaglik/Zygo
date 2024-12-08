@@ -13,13 +13,11 @@ import { useGetUserById } from "@/services/userServices";
 import { MessageCircle } from "lucide-react";
 
 const PostCard = ({ post }: { post: IPost }) => {
+  const [showComments, setShowComments] = useState(false);
+  const [showFullContent, setShowFullContent] = useState(false);
   const { user: currentUser, loading } = useAuthStore();
   const { data: user, isLoading: userLoading } = useGetUserById(post.user._id);
   const { data: comments, isLoading } = useGetCommentsByPostId(post._id);
-  const { data: likes } = useGetPostLikes(post._id);
-
-  const [showComments, setShowComments] = useState(false);
-  const [showFullContent, setShowFullContent] = useState(false);
 
   const handleShowComments = () => {
     setShowComments((prev) => !prev);
@@ -34,14 +32,14 @@ const PostCard = ({ post }: { post: IPost }) => {
   }
 
   return (
-    <section className="md:w-[700px] mx-auto relative">
-      <div className="flex justify-start  border-accent border-b pb-2 mt-2 md:mt-0">
+    <section className="md:w-[700px] mx-auto relative mb-5">
+      <div className="flex justify-start  border-accent border-b">
         <UserCard user={user!} />
       </div>
 
       {/* Yorumlar Bölümü */}
       {showComments && (
-        <div className="absolute top-16 left-0 w-full h-[515px] bg-background z-10  border-b border-accent">
+        <div className="absolute top-16 left-0 w-full h-[508px] bg-background z-10  border-b border-accent">
           <h2 className="font-semibold text-center border-b border-accent w-fit mx-auto">
             Yorumlar
           </h2>
@@ -83,7 +81,6 @@ const PostCard = ({ post }: { post: IPost }) => {
         <div>
           <PostBottom
             post={post}
-            likes={likes!}
             userId={currentUser._id}
             comments={comments!}
             handleShowComments={handleShowComments}

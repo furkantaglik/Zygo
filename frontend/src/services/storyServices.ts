@@ -13,6 +13,17 @@ export const useGetAllStories = () => {
     },
   });
 };
+export const useGetFollowingStories = () => {
+  return useQuery<IStory[], Error>({
+    queryKey: ["stories"],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get<IStory[]>(
+        "/story/get-following-stories"
+      );
+      return data;
+    },
+  });
+};
 
 export const useGetuserStories = (userId: string) => {
   return useQuery<IStory[], Error>({
@@ -29,11 +40,11 @@ export const useGetuserStories = (userId: string) => {
 
 export const useCreateStory = () => {
   const queryClient = useQueryClient();
-  return useMutation<IStory, Error, IStory>({
+  return useMutation<IStory, Error, FormData>({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["userStories"] });
     },
-    mutationFn: async (newStory: IStory) => {
+    mutationFn: async (newStory: FormData) => {
       const { data } = await axiosInstance.post<IStory>(
         "/story/create-story",
         newStory
