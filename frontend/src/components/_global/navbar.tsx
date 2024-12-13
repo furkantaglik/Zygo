@@ -23,7 +23,7 @@ const Navbar = () => {
   const menuItems = [
     { href: "/", label: "Ana Sayfa", icon: <House /> },
     { href: "/explore", label: "Keşfet", icon: <Compass /> },
-    { href: "/messages", label: "Mesajlar", icon: <MessageCircle /> },
+    { href: "/inbox", label: "Mesajlar", icon: <MessageCircle /> },
     { href: "/notifications", label: "Bildirimler", icon: <Bell /> },
   ];
 

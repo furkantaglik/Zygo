@@ -88,7 +88,7 @@ const PostCard = ({ post }: { post: IPost }) => {
           />
         </div>
 
-        <div className="text-sm border-b-2 border-dashed border-accent">
+        <div className="text-sm border-b-2 border-dashed border-accent pb-2">
           <p
             className={`italic ${!showFullContent ? "line-clamp-2" : ""}`}
             style={{
@@ -97,7 +97,7 @@ const PostCard = ({ post }: { post: IPost }) => {
               WebkitBoxOrient: "vertical",
             }}
           >
-            {post.content}
+            <strong> {post.user.username}</strong> {post.content}
           </p>
           {post.content.length > 100 && (
             <button

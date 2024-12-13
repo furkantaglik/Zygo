@@ -16,7 +16,9 @@ const ExplorePage = () => {
   }
 
   if (!posts || posts.length === 0) {
-    return <p>Henüz bir gönderi yayınlanmadı</p>;
+    return (
+      <p className="text-center text-gray-500">Henüz kimse Birşey paylaşmadı</p>
+    );
   }
 
   return (

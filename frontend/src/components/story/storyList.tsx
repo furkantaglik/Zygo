@@ -35,7 +35,7 @@ const StoryList = () => {
 
   return (
     <div>
-      <div className="flex overflow-x-auto gap-4 p-2 justify-center items-center">
+      <div className="flex overflow-x-auto gap-4 p-2 justify-start items-center">
         {uniqueUsers?.map((story) => (
           <div
             key={story?.user._id}
