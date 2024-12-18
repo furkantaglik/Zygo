@@ -22,7 +22,7 @@ const ConnectionSchema = new Schema<IConnection>(
     },
     status: {
       type: String,
-      enum: ["pending", "accepted", "rejected", "canceled", "blocked"],
+      enum: ["pending", "accepted", "rejected", "canceled"],
       default: "pending",
     },
   },

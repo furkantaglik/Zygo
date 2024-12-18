@@ -15,14 +15,10 @@ export const createPost = async (c: Context) => {
   try {
     const file = await c.get("file");
     const { content } = await c.req.parseBody();
+    const user = c.get("user") as IUser;
 
     if (!file || !file.path) {
       return sendResponse(c, 400, "Dosya yüklenmedi.");
-    }
-
-    const user = c.get("user") as IUser;
-    if (!user) {
-      return sendResponse(c, 401, "Kullanıcı oturumu geçerli değil.");
     }
 
     if (!content) {

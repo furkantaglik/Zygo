@@ -2,20 +2,26 @@ import type { Context } from "hono";
 import { Story } from "../models/story.js";
 import { sendResponse } from "../lib/utils/sendResponse.js";
 import { validateObjectId } from "../lib/utils/valideObjectId.js";
-import { User } from "../models/user.js";
+import { User, type IUser } from "../models/user.js";
 
 export const createStory = async (c: Context) => {
-  const { content, mediaType } = await c.req.json();
-  const userId = c.get("user").id;
+  const file = await c.get("file");
+  const { content } = await c.req.parseBody();
+  const user = c.get("user") as IUser;
 
-  if (!content || !mediaType) {
-    return sendResponse(c, 400, "Content ve mediaType alanları gereklidir.");
+  if (!file || !file.path) {
+    return sendResponse(c, 400, "Dosya yüklenmedi.");
+  }
+
+  if (!content) {
+    return sendResponse(c, 400, "İçerik alanı zorunludur.");
   }
 
   const newStory = new Story({
-    user: userId,
+    user: user.id,
     content,
-    mediaType,
+    mediaUrl: file?.path,
+    mediaType: file?.mediaType,
     expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
   });
 
@@ -92,7 +98,7 @@ export const getFollowingStories = async (c: Context) => {
     }
     const followingIds = user.following.map((f: any) => f._id);
     const stories = await Story.find({ user: { $in: followingIds } })
-      .populate("user", "username")
+      .populate("user", "username avatar")
       .sort({ createdAt: -1 });
 
     return sendResponse(

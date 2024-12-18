@@ -1,34 +1,30 @@
 import { Comment } from "../models/comment.js";
 import { sendResponse } from "../lib/utils/sendResponse.js";
 import type { Context } from "hono";
-import { validateObjectId } from "../lib/utils/valideObjectId.js";
-
-// const validateCommentAndPostIds = (
-//   commentId: string | null,
-//   postId: string
-// ) => {
-//   if (!validateObjectId(commentId) || !validateObjectId(postId)) {
-//     return { error: "Geçersiz yorum veya gönderi ID." };
-//   }
-//   return { valid: true };
-// };
+import { Post } from "../models/post.js";
+import { Notification } from "../models/notification.js";
 
 export const createComment = async (c: Context) => {
   const { postId, content } = await c.req.json();
   const userId = c.get("user").id;
 
   try {
-    const newComment = new Comment({
-      post: postId,
-      user: userId,
-      content,
-    });
-
+    const newComment = new Comment({ post: postId, user: userId, content });
     await newComment.save();
+
+    const post = await Post.findById(postId).populate("user ");
+    if (post && post.user.id !== userId) {
+      await Notification.create({
+        user: post.user._id,
+        sender: userId,
+        type: "comment",
+        post: postId,
+        content,
+      });
+    }
+
     return sendResponse(c, 200, "Yorum başarıyla eklendi.", newComment);
   } catch (error) {
-    console.log(error);
-
     return sendResponse(c, 500, "Yorum eklenirken bir hata oluştu.");
   }
 };
@@ -83,7 +79,7 @@ export const getCommentsByPostId = async (c: Context) => {
   try {
     const comments = await Comment.find({ post: postId })
 
-      .populate("user", "username avatar")
+      .populate("user", "username avatar verified")
       .sort({ createdAt: -1 });
 
     return sendResponse(c, 200, "Yorumlar başarıyla getirildi.", comments);

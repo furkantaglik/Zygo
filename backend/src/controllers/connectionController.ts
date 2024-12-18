@@ -221,7 +221,7 @@ export const getFollowers = async (c: Context) => {
   }
 
   const user = await User.findById(userId)
-    .populate("followers", "username avatar")
+    .populate("followers", "username avatar verified")
     .sort({ createdAt: -1 });
   if (!user) {
     return sendResponse(c, 404, "Kullanıcı bulunamadı.");
@@ -238,7 +238,7 @@ export const getFollowing = async (c: Context) => {
   }
 
   const user = await User.findById(userId)
-    .populate("following", "username avatar")
+    .populate("following", "username avatar verified")
     .sort({ createdAt: -1 });
   if (!user) {
     return sendResponse(c, 404, "Kullanıcı bulunamadı.");
@@ -352,12 +352,12 @@ export const getConnectionStatuses = async (c: Context) => {
 
   try {
     const sentRequests = await Connection.find({ requester: userId })
-      .populate("receiver", "username avatar")
+      .populate("receiver", "username avatar verified")
       .lean()
       .sort({ createdAt: -1 });
 
     const receivedRequests = await Connection.find({ receiver: userId })
-      .populate("requester", "username avatar")
+      .populate("requester", "username avatar verified")
       .lean()
       .sort({ createdAt: -1 });
 
@@ -367,7 +367,7 @@ export const getConnectionStatuses = async (c: Context) => {
         { receiver: userId, status: "accepted" },
       ],
     })
-      .populate("requester receiver", "username avatar")
+      .populate("requester receiver", "username avatar verified")
       .lean()
       .sort({ createdAt: -1 });
 
@@ -377,7 +377,7 @@ export const getConnectionStatuses = async (c: Context) => {
         { receiver: userId, status: "rejected" },
       ],
     })
-      .populate("requester receiver", "username avatar")
+      .populate("requester receiver", "username avatar verified")
       .lean()
       .sort({ createdAt: -1 });
 
@@ -387,7 +387,7 @@ export const getConnectionStatuses = async (c: Context) => {
         { receiver: userId, status: "blocked" },
       ],
     })
-      .populate("requester receiver", "username avatar")
+      .populate("requester receiver", "username avatar verified")
       .lean()
       .sort({ createdAt: -1 });
 

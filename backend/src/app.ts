@@ -11,6 +11,9 @@ import storyRouters from "./routers/storyRouters.js";
 import commentRouters from "./routers/commentRouters.js";
 import likeRouters from "./routers/likeRouters.js";
 import userRouters from "./routers/userRouters.js";
+import saveRouters from "./routers/saveRouters.js";
+import messageRouters from "./routers/messageRouters.js";
+import notificationRouters from "./routers/notificationRouters.js";
 
 //* configuration
 const app = new Hono().basePath("/api");
@@ -38,5 +41,8 @@ app.route("/story", storyRouters);
 app.route("/comment", commentRouters);
 app.route("/like", likeRouters);
 app.route("/user", userRouters);
+app.route("/save", saveRouters);
+app.route("/message", messageRouters);
+app.route("/notification", notificationRouters);
 
 export default app;

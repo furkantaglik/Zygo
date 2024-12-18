@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface IStory extends Document {
   content: string;
   mediaType: "image" | "video";
+  mediaUrl: string;
   expiresAt: Date;
   createdAt?: Date;
   updatedAt?: Date;
@@ -13,6 +14,7 @@ const StorySchema: Schema = new Schema(
   {
     content: { type: String, required: true },
     mediaType: { type: String, enum: ["image", "video"], required: true },
+    mediaUrl: { type: String, required: true },
     expiresAt: { type: Date, required: true },
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   },
