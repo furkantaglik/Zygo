@@ -36,10 +36,10 @@ const ProfileConnectionCard = ({ userData }: { userData: IUser }) => {
 
   if (authLoading) return <Spinner />;
 
-  const isFollowing = userData.followers.includes(currentUser!._id);
-  const isMeRequestSent = userData.receivedRequests.includes(currentUser!._id);
-  const isHerRequestSent = userData.sentRequests.includes(currentUser!._id);
-  const isMutualFollower = userData.following.includes(currentUser!._id);
+  const isFollowing = userData.followers?.includes(currentUser!._id);
+  const isMeRequestSent = userData.receivedRequests?.includes(currentUser!._id);
+  const isHerRequestSent = userData.sentRequests?.includes(currentUser!._id);
+  const isMutualFollower = userData.following?.includes(currentUser!._id);
   const isOwnProfile = currentUser?._id === userData._id;
 
   const handleSendRequest = () =>

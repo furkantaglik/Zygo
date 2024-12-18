@@ -3,7 +3,7 @@ import Spinner from "@/components/_global/spinner";
 import Avatar from "@/components/user/avatar";
 import { useAuthStore } from "@/lib/zustand/authStore";
 import { useGetInbox } from "@/services/messageServices";
-import { MessageCircle } from "lucide-react";
+import { Check, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { useGetFollowing } from "@/services/connectionServices";
@@ -19,6 +19,10 @@ const InboxPage = () => {
   if (isLoading || loading || followingLoading) {
     return <Spinner />;
   }
+
+  const filteredFollowingUsers = followingUsers?.filter((user) => {
+    return !inbox!.some((inboxUser) => inboxUser._id === user._id);
+  });
 
   return (
     <section>
@@ -37,10 +41,13 @@ const InboxPage = () => {
               >
                 <div className="flex gap-x-1 items-center font-semibold">
                   <Avatar size={50} avatarUrl={user.avatar} />
-                  <h1>{user.username}</h1>
+                  <h1 className="flex items-center gap-x-1">
+                    {user.username}{" "}
+                    {user.verified && <Check className="text-primary " />}
+                  </h1>
                 </div>
                 <div className="flex items-center gap-x-2">
-                  <span className="text-xs  text-gray-500">
+                  <span className="text-xs text-gray-500">
                     Sohbete devam et
                   </span>
                   <MessageCircle />
@@ -51,14 +58,14 @@ const InboxPage = () => {
         </div>
       )}
 
-      {/* Takip Edilen Kullanıcılardan Sohbet Başlatma */}
-      {followingUsers && followingUsers.length > 0 && (
+      {/* yeni sohbet önerileri */}
+      {filteredFollowingUsers && filteredFollowingUsers.length > 0 && (
         <div className="mt-8">
-          <h2 className="font-semibold  mb-3 text-center">
+          <h2 className="font-semibold mb-3 text-center">
             Yeni Sohbet Önerileri
           </h2>
           <div className="flex flex-col gap-5 max-w-[600px] mx-auto">
-            {followingUsers.map((user) => (
+            {filteredFollowingUsers.map((user) => (
               <Link
                 href={`/inbox/${user._id}`}
                 key={user._id}
@@ -66,10 +73,13 @@ const InboxPage = () => {
               >
                 <div className="flex gap-x-1 items-center font-semibold">
                   <Avatar size={50} avatarUrl={user.avatar} />
-                  <h1>{user.username}</h1>
+                  <h1 className="flex items-center gap-x-1">
+                    {user.username}{" "}
+                    {user.verified && <Check className="text-primary " />}
+                  </h1>
                 </div>
                 <div className="flex items-center gap-x-2">
-                  <span className="text-xs  text-gray-500">Yeni sohbet</span>
+                  <span className="text-xs text-gray-500">Yeni sohbet</span>
                   <MessageCircle />
                 </div>
               </Link>
@@ -79,8 +89,8 @@ const InboxPage = () => {
       )}
 
       {(!inbox || inbox.length === 0) &&
-        (!followingUsers || followingUsers.length === 0) && (
-          <p className="text-center mt-5">
+        (!filteredFollowingUsers || filteredFollowingUsers.length === 0) && (
+          <p className="text-center mt-5 flex justify-center items-center h-screen text-gray-500">
             Henüz kimseyle mesajlaşmadınız veya takip ettiğiniz kimse yok.
           </p>
         )}

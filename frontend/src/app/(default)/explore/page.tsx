@@ -17,7 +17,9 @@ const ExplorePage = () => {
 
   if (!posts || posts.length === 0) {
     return (
-      <p className="text-center text-gray-500">Henüz kimse Birşey paylaşmadı</p>
+      <p className="text-center text-gray-500 h-screen flex items-center justify-center">
+        Henüz kimse Birşey paylaşmadı
+      </p>
     );
   }
 

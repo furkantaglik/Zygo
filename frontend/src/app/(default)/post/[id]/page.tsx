@@ -3,17 +3,19 @@ import React, { useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Spinner from "@/components/_global/spinner";
 import PostCard from "@/components/post/postCard";
-import { useGetUserPosts } from "@/services/postServices";
+import { useGetPostById, useGetUserPosts } from "@/services/postServices";
 import { useAuthStore } from "@/lib/zustand/authStore";
 
 const PostDetailPage = () => {
-  const { user: currentUser, loading } = useAuthStore();
   const params = useParams<{ id: string }>();
-  const { data: userPosts, isLoading } = useGetUserPosts(currentUser!._id);
+  const { data: post, isLoading: postLoading } = useGetPostById(params.id);
+  const { data: userPosts, isLoading: userPostLoading } = useGetUserPosts(
+    post && post.user._id
+  );
   const postRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    if (params.id && userPosts) {
+    if (params.id && userPosts && post) {
       const index = userPosts.findIndex((post) => post._id === params.id);
       if (index !== -1 && postRefs.current[index]) {
         postRefs.current[index]?.scrollIntoView({
@@ -23,7 +25,9 @@ const PostDetailPage = () => {
     }
   }, [params.id, userPosts]);
 
-  if (isLoading || loading) {
+  useEffect(() => {});
+
+  if (postLoading || userPostLoading) {
     return <Spinner />;
   }
 

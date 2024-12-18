@@ -9,6 +9,7 @@ import Spinner from "../_global/spinner";
 import Avatar from "../user/avatar";
 import Link from "next/link";
 import { timeAgo } from "@/lib/utils/timeAgo";
+import { Check } from "lucide-react";
 
 const ConnectionList = () => {
   const { user: currentUser } = useAuthStore();
@@ -57,15 +58,15 @@ const ConnectionList = () => {
   };
 
   return (
-    <div className="border border-accent p-4 sm:p-6 w-full rounded-lg shadow-lg">
-      <h1 className="text-xl font-semibold  mb-6">Bağlantı Yönetimi</h1>
+    <div className="border border-accent  w-full rounded-lg shadow-lg h-full">
+      <h1 className="text-md font-semibold my-2 ms-2">Bağlantı Yönetimi</h1>
 
       {filteredRequests.length > 0 ? (
-        <ul className="space-y-4">
+        <ul className="space-y-0 h-[200px] overflow-y-auto no-scrollbar">
           {filteredRequests.map((request, index) => (
             <li
               key={index}
-              className={`p-4 border border-accent grid items-center transition-colors justify-between w-full ${
+              className={`p-1 border border-accent grid items-center transition-colors justify-between w-full ${
                 request.action === "receive"
                   ? "grid-cols-1 gap-3"
                   : "grid-cols-2"
@@ -74,11 +75,16 @@ const ConnectionList = () => {
               <div className="flex gap-x-4 items-center">
                 <Link
                   href={`/${request.relatedUser}`}
-                  className="flex items-center gap-3 hover:text-primary"
+                  className="flex items-center gap-3 "
                 >
                   <Avatar size={40} avatarUrl={request.avatar} />
                   <div>
-                    <strong className="text-lg">{request.relatedUser}</strong>
+                    <h1 className="flex items-center gap-x-1  font-semibold">
+                      {request.relatedUser}
+                      {request.requester.verified && (
+                        <Check className="text-primary " />
+                      )}
+                    </h1>
                     <p className="text-sm">{request.status}</p>
                   </div>
                 </Link>

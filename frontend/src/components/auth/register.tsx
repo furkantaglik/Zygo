@@ -68,7 +68,7 @@ const Register = () => {
               name="username"
               value={formData.username}
               onChange={handleChange}
-              placeholder="------"
+              placeholder="-----------------"
               className="bg-transparent ring-0 border-b border-accent outline-none focus:ring focus:ring-accent rounded p-1"
             />
           </div>

@@ -8,6 +8,7 @@ import {
   Settings,
   Image,
   LogOut,
+  Check,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -72,7 +73,10 @@ const ProfileCard = ({ userData }: { userData: IUser }) => {
 
         <div className="lg:col-span-9 flex flex-col gap-y-5 w-full items-center lg:items-start">
           <div className="text-xl font-semibold flex items-center gap-x-4 md:w-full ">
-            <h1>{userData.username}</h1>
+            <h1 className="flex items-center gap-x-1">
+              {userData.username}{" "}
+              {userData.verified && <Check className="text-primary " />}
+            </h1>
             {currentUser && currentUser._id === userData._id && (
               <div className="flex justify-end gap-x-2 w-full">
                 <Link

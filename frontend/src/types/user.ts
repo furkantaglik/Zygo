@@ -1,9 +1,3 @@
-import { IComment } from "./comment";
-import { IConnection } from "./connection";
-import { ILike } from "./like";
-import { IPost } from "./post";
-import { IStory } from "./story";
-
 export type IUser = {
   _id: string;
   firstName?: string;
@@ -15,16 +9,11 @@ export type IUser = {
   avatar?: string;
   role: "admin" | "user";
   private: boolean;
+  verified: boolean;
   createdAt?: Date;
   updatedAt?: Date;
   followers: string[];
   following: string[];
-  posts: IPost[];
-  stories: IStory[];
-  comments: IComment[];
-  likes: ILike[];
   sentRequests: string[];
   receivedRequests: string[];
-  rejectedRequests: string[];
-  rejectedBy: string[];
 };

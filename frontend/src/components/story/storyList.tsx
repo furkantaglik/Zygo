@@ -25,7 +25,6 @@ const StoryList = () => {
   };
 
   if (isLoading) return <Spinner />;
-  if (isError) return <p>Error fetching stories.</p>;
 
   const uniqueUsers = Array.from(
     new Set(stories?.map((story) => story.user._id))
@@ -35,20 +34,26 @@ const StoryList = () => {
 
   return (
     <div>
-      <div className="flex overflow-x-auto gap-4 p-2 justify-start items-center">
-        {uniqueUsers?.map((story) => (
-          <div
-            key={story?.user._id}
-            className="cursor-pointer flex flex-col items-center"
-            onClick={() =>
-              handleUserClick(story?.user._id!, story?.user.username!)
-            }
-          >
-            <Avatar size={50} avatarUrl={story?.user.avatar} />
-            <span className="text-xs">{story?.user.username}</span>
-          </div>
-        ))}
-      </div>
+      {stories?.length === 0 ? (
+        <p className="text-center text-gray-500 py-5">
+          Şu an için kimse bir şey paylaşmadı.
+        </p>
+      ) : (
+        <div className="flex overflow-x-auto gap-4 p-2 justify-start items-center">
+          {uniqueUsers?.map((story) => (
+            <div
+              key={story?.user._id}
+              className="cursor-pointer flex flex-col items-center"
+              onClick={() =>
+                handleUserClick(story?.user._id!, story?.user.username!)
+              }
+            >
+              <Avatar size={50} avatarUrl={story?.user.avatar} />
+              <span className="text-xs">{story?.user.username}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {isModalOpen && (
         <Modal

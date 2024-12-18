@@ -7,19 +7,27 @@ import React from "react";
 
 const Savedpage = () => {
   const { data: savedPosts, isLoading } = useGetUserSaves();
+
   if (isLoading) {
     return <Spinner />;
   }
+
   return (
-    <>
-      <section className="grid grid-cols-3 gap-2">
-        {savedPosts?.map((saved, index) => (
-          <Link key={saved.post._id} href={`/post/${saved.post._id}`}>
-            <PostImageCard post={saved.post} />
-          </Link>
-        ))}
-      </section>
-    </>
+    <section className="">
+      {savedPosts?.length === 0 ? (
+        <p className="text-center text-gray-500">
+          Kaydettikleriniz burada gösterilir
+        </p>
+      ) : (
+        <div className="grid grid-cols-3 ">
+          {savedPosts?.map((saved) => (
+            <Link key={saved.post._id} href={`/post/${saved.post._id}`}>
+              <PostImageCard post={saved.post} />
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
   );
 };
 

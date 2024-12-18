@@ -35,7 +35,7 @@ const MessageCard: React.FC<MessageCardProps> = ({
       </div>
 
       <div className="flex justify-between items-center gap-x-2">
-        <p className="break-words">{message.content}</p> {/* Mesaj içeriği */}
+        <p className="break-words">{message.content}</p>
       </div>
     </div>
   );

@@ -24,7 +24,7 @@ export const useGetFollowingPosts = () => {
   });
 };
 
-export const useGetUserPosts = (userId: string) => {
+export const useGetUserPosts = (userId: string | undefined) => {
   return useQuery<IPost[], Error>({
     queryKey: ["userPosts", userId],
     enabled: !!userId,

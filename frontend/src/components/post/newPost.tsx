@@ -25,7 +25,7 @@ const NewPost = () => {
     e.preventDefault();
 
     if (!file) {
-      alert("Lütfen bir dosya seçin!");
+      toast.error("Lütfen bir dosya seçin!");
       return;
     }
 

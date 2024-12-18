@@ -42,15 +42,13 @@ const HomePage = () => {
       </div>
 
       <div className="border-b border-accent mb-10">
-        <h2 className=" font-semibold text-lg">Hikayeler</h2>
+        <h2 className=" font-semibold text-md">Hikayeler</h2>
         <StoryList />
       </div>
 
       {!hasFollowing && allUsers && (
         <div className="mb-10">
-          <h2 className="text-xl font-semibold mb-4">
-            Takip Etmeniz Önerilen Kullanıcılar
-          </h2>
+          <h2 className="text-md font-semibold mb-4">Önerilen Kullanıcılar</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {allUsers.map((user) => (
               <div

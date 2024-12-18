@@ -1,12 +1,14 @@
+"use client";
 import ConnectionList from "@/components/connection/connectionList";
-import React from "react";
+import NotificationList from "@/components/notification/notificationList";
 
-const page = () => {
+const NotificationsPage = () => {
   return (
-    <>
+    <section className="flex flex-col gap-y-5 ">
       <ConnectionList />
-    </>
+      <NotificationList />
+    </section>
   );
 };
 
-export default page;
+export default NotificationsPage;

@@ -46,6 +46,17 @@ export const useGetMessages = (userId: string) => {
     },
   });
 };
+export const useGetUnreadMessages = () => {
+  return useQuery<IMessage[], Error>({
+    queryKey: ["message"],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get<IMessage[]>(
+        `/message/get-unread-messages`
+      );
+      return data;
+    },
+  });
+};
 
 export const useGetInbox = () => {
   return useQuery<IUser[], Error>({
@@ -53,6 +64,18 @@ export const useGetInbox = () => {
     queryFn: async () => {
       const { data } = await axiosInstance.get<IUser[]>(`/message/get-inbox`);
       return data;
+    },
+  });
+};
+
+export const useMarkMessagesAsRead = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, string>({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["message"] });
+    },
+    mutationFn: async (targetUserId: string) => {
+      await axiosInstance.get(`/message/mark-messages-as-read/${targetUserId}`);
     },
   });
 };

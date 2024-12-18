@@ -1,4 +1,3 @@
-"use client";
 import { useState } from "react";
 import { IPost } from "@/types/post";
 import { IComment } from "@/types/comment";
@@ -7,43 +6,81 @@ import UserCard from "../user/userCard";
 import CommentCard from "../comment/commentCard";
 import Spinner from "../_global/spinner";
 import PostBottom from "./postBottom";
-import { useGetPostLikes } from "@/services/likeServices";
 import { useAuthStore } from "@/lib/zustand/authStore";
 import { useGetUserById } from "@/services/userServices";
-import { MessageCircle } from "lucide-react";
+import { useDeletePost } from "@/services/postServices";
+import { Delete } from "lucide-react";
+import Modal from "../_global/modal";
 
 const PostCard = ({ post }: { post: IPost }) => {
   const [showComments, setShowComments] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { user: currentUser, loading } = useAuthStore();
   const { data: user, isLoading: userLoading } = useGetUserById(post.user._id);
   const { data: comments, isLoading } = useGetCommentsByPostId(post._id);
+  const { mutate } = useDeletePost();
 
-  const handleShowComments = () => {
-    setShowComments((prev) => !prev);
-  };
-
-  const handleToggleContent = () => {
-    setShowFullContent((prev) => !prev);
-  };
+  const handleShowComments = () => setShowComments((prev) => !prev);
+  const handleToggleContent = () => setShowFullContent((prev) => !prev);
 
   if (loading || !currentUser || userLoading) {
     return <Spinner />;
   }
 
+  const handleDeletePost = () => {
+    mutate(post._id);
+  };
+
   return (
-    <section className="md:w-[700px] mx-auto relative mb-5">
-      <div className="flex justify-start  border-accent border-b">
+    <section className="md:w-[700px] mx-auto relative mb-5 ">
+      <div className="flex justify-between items-center border-accent border-b">
         <UserCard user={user!} />
+        {/* Gönderi sahibiyse silme butonu */}
+        {currentUser._id === post.user._id && (
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="text-red-500 font-semibold text-sm"
+          >
+            <Delete />
+          </button>
+        )}
       </div>
+
+      {/* delete modal */}
+      {showDeleteModal && (
+        <Modal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          title="Gönderiyi Sil"
+          footer={
+            <>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 bg-accent rounded"
+              >
+                Hayır
+              </button>
+              <button
+                onClick={handleDeletePost}
+                className="px-4 py-2 bg-primary rounded"
+              >
+                Evet
+              </button>
+            </>
+          }
+        >
+          <p>Gönderiyi silmek istediğinize Emin misiniz?</p>
+        </Modal>
+      )}
 
       {/* Yorumlar Bölümü */}
       {showComments && (
-        <div className="absolute top-16 left-0 w-full h-[508px] bg-background z-10  border-b border-accent">
+        <div className="absolute top-10 left-0 w-full h-[522px] bg-background z-10  border-b border-accent">
           <h2 className="font-semibold text-center border-b border-accent w-fit mx-auto">
             Yorumlar
           </h2>
-          <div className="mt-5 max-h-[480px] overflow-y-auto no-scrollbar ">
+          <div className="mt-5 max-h-[480px] overflow-y-auto no-scrollbar">
             {isLoading ? (
               <Spinner />
             ) : comments?.length ? (
@@ -67,15 +104,20 @@ const PostCard = ({ post }: { post: IPost }) => {
         </div>
       )}
 
+      {/* Gönderi İçeriği */}
       <div className="relative mt-5">
         <div className="mx-auto flex justify-center items-center relative">
           {post.mediaType === "video" ? (
-            <video autoPlay controls loop className="w-full h-[500px]">
+            <video autoPlay controls loop className="object-fill h-[500px]">
               <source src={post.mediaUrl} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           ) : (
-            <img src={post.mediaUrl} alt={post.content} className="h-[500px]" />
+            <img
+              src={post.mediaUrl}
+              alt={post.content}
+              className="h-[500px] object-fill"
+            />
           )}
         </div>
         <div>
@@ -102,7 +144,7 @@ const PostCard = ({ post }: { post: IPost }) => {
           {post.content.length > 100 && (
             <button
               onClick={handleToggleContent}
-              className="text-primary text-xs font-semibold  "
+              className="text-primary text-xs font-semibold"
             >
               {showFullContent ? "Daha Az Göster" : "Devamını Göster"}
             </button>

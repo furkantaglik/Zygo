@@ -74,10 +74,18 @@ const EditProfile = () => {
         onSubmit={handleSubmit}
         className="flex flex-col md:mx-10 mt-5 gap-y-10"
       >
-        <div className="flex flex-col mx-auto">
+        <div className="flex flex-col mx-auto relative">
+          <p className="absolute z-40 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white font-bold text-sm bg-black bg-opacity-50  rounded-full cursor-pointer">
+            Seç
+          </p>
+
           <div className="cursor-pointer" onClick={handleAvatarClick}>
-            <Avatar size={250} avatarUrl={avatarPreview} />
+            <Avatar
+              size={250}
+              avatarUrl={avatarPreview || "default-avatar.jpg"}
+            />
           </div>
+
           <input
             type="file"
             className="hidden"
