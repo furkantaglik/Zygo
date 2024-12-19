@@ -12,7 +12,7 @@ interface MessageBoxProps {
   currentUser: IUser;
 }
 
-const socket = io("https://zygobackend.vercel.app");
+const socket = io(process.env.NEXT_PUBLIC_API_URL);
 
 const MessageBox: React.FC<MessageBoxProps> = ({ targetUser, currentUser }) => {
   const [messages, setMessages] = useState<any[]>([]);
