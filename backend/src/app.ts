@@ -17,7 +17,13 @@ import notificationRouters from "./routers/notificationRouters.js";
 
 //* configuration
 const app = new Hono().basePath("/api");
-app.use(cors());
+app.use(
+  cors({
+    origin: '*', 
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'], 
+  })
+);
 app.use(prettyJSON());
 app.onError((err, c) => {
   return errorHandler(err, c);
