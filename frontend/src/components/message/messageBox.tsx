@@ -6,13 +6,14 @@ import Link from "next/link";
 import { IUser } from "@/types/user";
 import MessageCard from "./messageCard";
 import { useMarkMessagesAsRead } from "@/services/messageServices";
+import { usePathname, useRouter } from "next/navigation";
 
 interface MessageBoxProps {
   targetUser: IUser;
   currentUser: IUser;
 }
 
-const socket = io(process.env.NEXT_PUBLIC_API_URL);
+const socket = io("https://905c-46-1-246-109.ngrok-free.app",{transports:['websocket']});
 
 const MessageBox: React.FC<MessageBoxProps> = ({ targetUser, currentUser }) => {
   const [messages, setMessages] = useState<any[]>([]);
@@ -22,6 +23,7 @@ const MessageBox: React.FC<MessageBoxProps> = ({ targetUser, currentUser }) => {
   const { mutate } = useMarkMessagesAsRead();
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (messages?.length) {
@@ -29,11 +31,8 @@ const MessageBox: React.FC<MessageBoxProps> = ({ targetUser, currentUser }) => {
     }
   }, [messages, mutate]);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  socket.connect();
-
   useEffect(() => {
+    socket.connect();
     socket.emit("joinRoom", currentUser._id, targetUser._id);
 
     socket.on("receiveMessage", (message) => {
@@ -55,7 +54,8 @@ const MessageBox: React.FC<MessageBoxProps> = ({ targetUser, currentUser }) => {
     return () => {
       socket.disconnect();
     };
-  }, [currentUser, targetUser]);
+  }, [currentUser, targetUser]); 
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setContent(e.target.value);
