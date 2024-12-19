@@ -2,9 +2,10 @@
   "name": "zygo-backend",
   "type": "module",
   "scripts": {
-    "start": "node dist/server.js",
+    "build": "tsc",
     "dev": "tsx watch src/server.ts",
-    "build": "tsc"
+    "start": "node dist/server.js",
+    "deploy": "pnpm run build && vercel"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.7",
@@ -15,7 +16,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.1",
     "nanoid": "^5.0.9",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "vercel": "^39.2.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
