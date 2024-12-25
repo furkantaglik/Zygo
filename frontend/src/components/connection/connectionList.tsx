@@ -62,7 +62,7 @@ const ConnectionList = () => {
       <h1 className="text-md font-semibold my-2 ms-2">Bağlantı Yönetimi</h1>
 
       {filteredRequests.length > 0 ? (
-        <ul className="space-y-0 h-[200px] overflow-y-auto no-scrollbar">
+        <ul className="space-y-0 h-[300px] overflow-y-auto no-scrollbar">
           {filteredRequests.map((request, index) => (
             <li
               key={index}

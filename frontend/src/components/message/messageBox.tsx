@@ -13,7 +13,7 @@ interface MessageBoxProps {
   currentUser: IUser;
 }
 
-const socket = io("https://905c-46-1-246-109.ngrok-free.app",{transports:['websocket']});
+const socket = io("http://localhost:3000", { transports: ["websocket"] });
 
 const MessageBox: React.FC<MessageBoxProps> = ({ targetUser, currentUser }) => {
   const [messages, setMessages] = useState<any[]>([]);
@@ -54,8 +54,7 @@ const MessageBox: React.FC<MessageBoxProps> = ({ targetUser, currentUser }) => {
     return () => {
       socket.disconnect();
     };
-  }, [currentUser, targetUser]); 
-
+  }, [currentUser, targetUser]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setContent(e.target.value);

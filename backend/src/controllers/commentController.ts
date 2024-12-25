@@ -12,7 +12,7 @@ export const createComment = async (c: Context) => {
     const newComment = new Comment({ post: postId, user: userId, content });
     await newComment.save();
 
-    const post = await Post.findById(postId).populate("user ");
+    const post = await Post.findById(postId).populate("user");
     if (post && post.user.id !== userId) {
       await Notification.create({
         user: post.user._id,
@@ -25,6 +25,8 @@ export const createComment = async (c: Context) => {
 
     return sendResponse(c, 200, "Yorum başarıyla eklendi.", newComment);
   } catch (error) {
+    console.log(error);
+
     return sendResponse(c, 500, "Yorum eklenirken bir hata oluştu.");
   }
 };
