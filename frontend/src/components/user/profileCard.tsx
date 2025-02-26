@@ -26,7 +26,7 @@ const ProfileCard = ({ userData }: { userData: IUser }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user: currentUser, logout } = useAuthStore();
-  const [isPosTModalOpen, setIsPostModalOpen] = useState(false);
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [isStoryModalOpen, setIsStoryModalOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [userStoriesModal, setUserStoriesModal] = useState(false);
@@ -118,7 +118,7 @@ const ProfileCard = ({ userData }: { userData: IUser }) => {
                   <GalleryHorizontalEnd /> +
                 </button>
                 <Modal
-                  isOpen={isPosTModalOpen}
+                  isOpen={isPostModalOpen}
                   onClose={() => setIsPostModalOpen(false)}
                   title="Yeni Gönderi"
                 >

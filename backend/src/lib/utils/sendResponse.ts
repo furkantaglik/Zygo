@@ -1,9 +1,9 @@
 import type { Context } from "hono";
-import type { StatusCode } from "hono/utils/http-status";
+import type { ContentfulStatusCode } from "hono/utils/http-status";
 
 export const sendResponse = (
   c: Context,
-  statusCode: StatusCode,
+  statusCode: ContentfulStatusCode, 
   message: string | null,
   data: any = null
 ) => {

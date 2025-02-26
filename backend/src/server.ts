@@ -3,8 +3,10 @@ import { serve } from "@hono/node-server";
 import initializeSocket from "./socket.js";
 import startMongo from "./lib/db.js";
 
-const server = serve({ fetch: app.fetch });
+const PORT = 5000; 
+
+const server = serve({ fetch: app.fetch, port: PORT });
 initializeSocket(server);
 await startMongo();
 
-console.log(`Server is running http://localhost:3000`);
+console.log(`Server is running http://localhost:${PORT}`);

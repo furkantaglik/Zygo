@@ -33,7 +33,7 @@ const PostBottom = ({
   showComments: boolean;
 }) => {
   const [newComment, setNewComment] = useState("");
-  const [isShowLikeListModal, setShowLikeLİstModal] = useState(false);
+  const [isShowLikeListModal, setShowLikeListModal] = useState(false);
   const { mutate: createLikeMutate } = useCreateLike();
   const { mutate: deleteLikeMutate } = useDeleteLike();
   const { mutate: createCommentMutate } = useCreateComment();
@@ -78,7 +78,7 @@ const PostBottom = ({
   };
 
   const handleShowLikeList = () => {
-    setShowLikeLİstModal(true);
+    setShowLikeListModal(true);
   };
 
   return (
@@ -136,7 +136,7 @@ const PostBottom = ({
         <Modal
           title="Beğeni Listesi"
           isOpen={isShowLikeListModal}
-          onClose={() => setShowLikeLİstModal(false)}
+          onClose={() => setShowLikeListModal(false)}
         >
           <PostLikeList postId={post._id} />
         </Modal>

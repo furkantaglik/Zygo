@@ -4,7 +4,6 @@ import { useParams } from "next/navigation";
 import Spinner from "@/components/_global/spinner";
 import PostCard from "@/components/post/postCard";
 import { useGetPostById, useGetUserPosts } from "@/services/postServices";
-import { useAuthStore } from "@/lib/zustand/authStore";
 
 const PostDetailPage = () => {
   const params = useParams<{ id: string }>();
